@@ -1,144 +1,173 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { LngLatBounds, Map as MapLibreMap, NavigationControl } from 'maplibre-gl'
+import {
+  Cartesian3,
+  Color,
+  createOsmBuildingsAsync,
+  EllipsoidTerrainProvider,
+  HeightReference,
+  ImageryLayer,
+  Ion,
+  Math as CesiumMath,
+  OpenStreetMapImageryProvider,
+  Rectangle,
+  Terrain,
+  Viewer,
+} from 'cesium'
+import RouteMapLeaflet from './RouteMapLeaflet'
 
-const EMPTY_DATA = []
-const FALLBACK_STYLE = {
-  version: 8,
-  sources: {
-    osm: {
-      type: 'raster',
-      tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
-      tileSize: 256,
-      attribution: '© OpenStreetMap contributors',
-    },
-  },
-  layers: [{ id: 'osm-raster', type: 'raster', source: 'osm' }],
+const DEFAULT_CENTER = [77.5946, 12.9716]
+const TOKEN = import.meta.env.VITE_CESIUM_ION_TOKEN?.trim()
+
+function validCoordinate(value) {
+  if (!Array.isArray(value) || value.length < 2) return false
+  const [longitude, latitude] = value.map(Number)
+  return Number.isFinite(longitude) && Number.isFinite(latitude)
+    && Math.abs(longitude) <= 180 && Math.abs(latitude) <= 90
 }
 
-function featureCollection(features = []) {
-  return { type: 'FeatureCollection', features }
-}
+export default function RouteMap({ gpsPoints = [], predictedRoute = [] }) {
+  const container = useRef(null)
+  const viewer = useRef(null)
+  const [ready, setReady] = useState(false)
+  const [fallback, setFallback] = useState(false)
+  const [mapMessage, setMapMessage] = useState('')
+  const [ionBuildingsReady, setIonBuildingsReady] = useState(false)
 
-function updateSources(map, gpsPoints, routeLine) {
-  map.getSource('pathsnap-gps')?.setData(featureCollection(gpsPoints.map((coordinates) => ({
-    type: 'Feature',
-    geometry: { type: 'Point', coordinates },
-    properties: {},
-  }))))
-  map.getSource('pathsnap-predicted-route')?.setData(featureCollection(routeLine.length > 1 ? [{
-    type: 'Feature',
-    geometry: { type: 'LineString', coordinates: routeLine },
-    properties: {},
-  }] : []))
-
-  const boundsPoints = [...gpsPoints, ...routeLine]
-  if (boundsPoints.length > 1) {
-    const bounds = boundsPoints.reduce((result, coordinate) => result.extend(coordinate),
-      new LngLatBounds(boundsPoints[0], boundsPoints[0]))
-    map.fitBounds(bounds, { padding: 50, maxZoom: 16, duration: 500 })
-  } else if (boundsPoints.length === 1) {
-    map.easeTo({ center: boundsPoints[0], zoom: 15, duration: 500 })
-  }
-}
-
-export default function RouteMap({ gpsPoints = EMPTY_DATA, predictedRoute = EMPTY_DATA }) {
-  const mapContainer = useRef(null)
-  const mapRef = useRef(null)
-  const dataRef = useRef({ gpsPoints, routeLine: [] })
-  const [mapError, setMapError] = useState('')
-  const [styleReady, setStyleReady] = useState(false)
-  const routeLine = useMemo(() => {
-    const coordinates = []
-    predictedRoute.forEach((segment) => {
-      segment.coordinates?.forEach((coordinate) => {
-        const previous = coordinates.at(-1)
-        if (!previous || previous[0] !== coordinate[0] || previous[1] !== coordinate[1]) {
-          coordinates.push(coordinate)
-        }
-      })
-    })
-    return coordinates
-  }, [predictedRoute])
-  dataRef.current = { gpsPoints, routeLine }
+  const route = useMemo(() => predictedRoute
+    .flatMap((segment) => Array.isArray(segment?.coordinates) ? segment.coordinates : [])
+    .filter(validCoordinate)
+    .map(([longitude, latitude]) => [Number(longitude), Number(latitude)]), [predictedRoute])
+  const gps = useMemo(() => gpsPoints.filter(validCoordinate)
+    .map(([longitude, latitude]) => [Number(longitude), Number(latitude)]), [gpsPoints])
 
   useEffect(() => {
-    if (!mapContainer.current || mapRef.current) return undefined
-    const map = new MapLibreMap({
-      container: mapContainer.current,
-      // Inline style avoids a separate style JSON request. OSM raster tiles are
-      // widely reachable; the route overlays work with either this or OpenFreeMap.
-      style: FALLBACK_STYLE,
-      center: gpsPoints[0] ?? routeLine[0] ?? [77.5946, 12.9716],
-      zoom: 15,
-      pitch: 0,
-      bearing: 0,
-    })
-    mapRef.current = map
-    map.addControl(new NavigationControl({ visualizePitch: true }), 'top-right')
-    map.on('error', (event) => {
-      const message = event.error?.message ?? 'The map style or map tiles could not be loaded.'
-      console.error('MapLibre error:', event.error ?? event)
-      setMapError(message)
-    })
-    map.on('load', () => {
-      setStyleReady(true)
-      setMapError('')
-      map.addSource('pathsnap-gps', { type: 'geojson', data: featureCollection() })
-      map.addLayer({
-        id: 'pathsnap-gps-points',
-        type: 'circle',
-        source: 'pathsnap-gps',
-        paint: {
-          'circle-radius': 4,
-          'circle-color': '#60a5fa',
-          'circle-stroke-color': '#0f172a',
-          'circle-stroke-width': 1,
+    if (!container.current || viewer.current || fallback) return undefined
+    let disposed = false
+    let cesiumViewer
+
+    try {
+      if (TOKEN) Ion.defaultAccessToken = TOKEN
+      cesiumViewer = new Viewer(container.current, {
+        baseLayer: new ImageryLayer(new OpenStreetMapImageryProvider({ url: 'https://tile.openstreetmap.org/' })),
+        terrainProvider: TOKEN ? undefined : new EllipsoidTerrainProvider(),
+        terrain: TOKEN ? Terrain.fromWorldTerrain() : undefined,
+        baseLayerPicker: false,
+        geocoder: false,
+        homeButton: false,
+        sceneModePicker: false,
+        navigationHelpButton: false,
+        animation: false,
+        timeline: false,
+        fullscreenButton: false,
+        infoBox: false,
+        selectionIndicator: false,
+        scene3DOnly: true,
+        requestRenderMode: false,
+      })
+      viewer.current = cesiumViewer
+      setReady(true)
+      cesiumViewer.scene.globe.depthTestAgainstTerrain = true
+      cesiumViewer.cesiumWidget.errorEvent.addEventListener((error) => {
+        console.error('Cesium rendering error:', error)
+        if (!disposed) setMapMessage(`Cesium map resource error: ${error.message ?? error}`)
+      })
+      cesiumViewer.camera.setView({
+        destination: Cartesian3.fromDegrees(DEFAULT_CENTER[0], DEFAULT_CENTER[1], 14000),
+        orientation: {
+          heading: CesiumMath.toRadians(0),
+          pitch: CesiumMath.toRadians(-42),
+          roll: 0,
         },
       })
-      map.addSource('pathsnap-predicted-route', { type: 'geojson', data: featureCollection() })
-      map.addLayer({
-        id: 'pathsnap-predicted-line',
-        type: 'line',
-        source: 'pathsnap-predicted-route',
-        paint: { 'line-color': '#b6ff3b', 'line-width': 5, 'line-opacity': 0.9 },
-      })
-      updateSources(map, dataRef.current.gpsPoints, dataRef.current.routeLine)
-      // The map sits in a dashboard panel; force a layout pass after its style loads.
-      requestAnimationFrame(() => map.resize())
-    })
-    const resizeObserver = new ResizeObserver(() => map.resize())
-    resizeObserver.observe(mapContainer.current)
-    return () => {
-      resizeObserver.disconnect()
-      map.remove()
-      mapRef.current = null
+
+      if (TOKEN) {
+        createOsmBuildingsAsync().then((buildings) => {
+          if (disposed) return
+          cesiumViewer.scene.primitives.add(buildings)
+          setIonBuildingsReady(true)
+          cesiumViewer.scene.requestRender()
+        }).catch((error) => {
+          console.error('Cesium OSM buildings failed to load:', error)
+          if (!disposed) setMapMessage(`3D buildings could not load: ${error.message}`)
+        })
+      } else {
+        setMapMessage('Add VITE_CESIUM_ION_TOKEN to frontend/.env.local to enable 3D buildings and terrain.')
+      }
+    } catch (error) {
+      console.error('Cesium viewer failed to initialize:', error)
+      setMapMessage(`Cesium could not start: ${error.message}`)
+      setFallback(true)
     }
-  }, [])
+
+    const resizeObserver = new ResizeObserver(() => cesiumViewer?.resize())
+    if (container.current) resizeObserver.observe(container.current)
+    return () => {
+      disposed = true
+      resizeObserver.disconnect()
+      cesiumViewer?.destroy()
+      viewer.current = null
+    }
+  }, [fallback])
 
   useEffect(() => {
-    // isStyleLoaded() is false while any tile source is loading (e.g. right after a
-    // fitBounds or while panning), which used to skip the update for a new trip.
-    // The sources exist once the 'load' handler has run, so gate on that instead.
-    const map = mapRef.current
-    if (styleReady && map?.getSource('pathsnap-gps')) {
-      updateSources(map, gpsPoints, routeLine)
-    }
-  }, [gpsPoints, routeLine, styleReady])
+    const activeViewer = viewer.current
+    if (!ready || !activeViewer || activeViewer.isDestroyed()) return
+    const entities = activeViewer.entities
+    entities.values
+      .filter((entity) => entity.id?.startsWith('pathsnap-'))
+      .forEach((entity) => entities.remove(entity))
 
-  return (
-    <div className="relative w-full h-full min-h-[420px] rounded-2xl overflow-hidden bg-[#0b1220]">
-      <div ref={mapContainer} className="absolute inset-0" />
-      {mapError && (
-        <div className="absolute inset-x-4 bottom-4 z-10 rounded-lg border border-amber-400/30 bg-slate-950/90 px-4 py-3 text-sm text-amber-100 shadow-lg">
-          <p className="font-semibold">Map tiles could not be loaded</p>
-          <p className="mt-1 text-xs text-slate-300">{mapError}. Check your internet connection or whether tile.openstreetmap.org is blocked.</p>
-        </div>
-      )}
-      {!styleReady && !mapError && (
-        <div className="absolute left-4 bottom-4 z-10 rounded-lg bg-slate-950/80 px-3 py-2 text-xs text-slate-300">
-          Loading street map…
-        </div>
-      )}
+    const pointsToFrame = [...gps, ...route]
+    gps.forEach(([longitude, latitude], index) => {
+      entities.add({
+        id: `pathsnap-gps-${index}`,
+        position: Cartesian3.fromDegrees(longitude, latitude, 8),
+        point: {
+          pixelSize: 7,
+          color: Color.fromCssColorString('#3b82f6'),
+          outlineColor: Color.WHITE,
+          outlineWidth: 2,
+          heightReference: HeightReference.CLAMP_TO_GROUND,
+        },
+      })
+    })
+    if (route.length > 1) {
+      entities.add({
+        id: 'pathsnap-route-line',
+        polyline: {
+          positions: Cartesian3.fromDegreesArray(route.flat()),
+          width: 7,
+          material: Color.fromCssColorString('#b6ff3b'),
+          clampToGround: true,
+        },
+      })
+    }
+    if (pointsToFrame.length > 1) {
+      const west = Math.min(...pointsToFrame.map(([longitude]) => longitude))
+      const east = Math.max(...pointsToFrame.map(([longitude]) => longitude))
+      const south = Math.min(...pointsToFrame.map(([, latitude]) => latitude))
+      const north = Math.max(...pointsToFrame.map(([, latitude]) => latitude))
+      activeViewer.camera.flyTo({
+        destination: Rectangle.fromDegrees(west, south, east, north),
+        duration: 1.1,
+        orientation: { heading: 0, pitch: CesiumMath.toRadians(-35), roll: 0 },
+      })
+    } else if (pointsToFrame.length === 1) {
+      activeViewer.camera.flyTo({ destination: Cartesian3.fromDegrees(...pointsToFrame[0], 3500), duration: 1.1 })
+    }
+  }, [gps, route, ready])
+
+  if (fallback) {
+    return <div className="relative h-full min-h-[420px] w-full overflow-hidden rounded-xl">
+      <RouteMapLeaflet gpsPoints={gpsPoints} predictedRoute={predictedRoute} />
+      <div className="absolute left-3 top-3 z-[1000] rounded-lg border border-amber-400/30 bg-black/85 px-3 py-2 text-xs text-amber-100">Cesium could not initialize. Showing the 2D map. {mapMessage}</div>
     </div>
-  )
+  }
+
+  return <div className="relative h-full min-h-[420px] w-full overflow-hidden rounded-xl bg-[#dce3e7]">
+    <div ref={container} className="absolute inset-0" />
+    {(!ready || (TOKEN && !ionBuildingsReady)) && !mapMessage && <div className="absolute bottom-3 left-3 z-10 rounded-lg bg-black/80 px-3 py-2 text-xs text-white">Loading Cesium 3D globe…</div>}
+    {mapMessage && <div className="absolute bottom-3 left-3 right-3 z-10 rounded-lg border border-amber-400/40 bg-black/85 px-3 py-2 text-xs text-amber-100">{mapMessage}</div>}
+    <div className="absolute left-3 top-3 z-10 rounded-lg border border-[#b6ff3b]/30 bg-black/75 px-3 py-2 text-[11px] text-[#d8ff9b]">CesiumJS 3D globe{ionBuildingsReady ? ' · buildings enabled' : ''}</div>
+  </div>
 }

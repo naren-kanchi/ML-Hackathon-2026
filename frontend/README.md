@@ -2,6 +2,8 @@
 
 React/Vite evaluator dashboard connected to the FastAPI backend.
 
+The map uses CesiumJS. OpenStreetMap imagery works without a token. To enable Cesium World Terrain and 3D OpenStreetMap buildings, create a public Cesium ion token, copy `.env.example` to `.env.local`, and set `VITE_CESIUM_ION_TOKEN`. Restrict the token to `http://localhost:5173` during local development.
+
 ## Start
 
 From the repository root, start the API in one terminal. In another PowerShell terminal:
