@@ -70,8 +70,6 @@ def raw_features(ctx) -> np.ndarray:
     o = c.obs
     T = ctx.T
     n = np.diff(c.ptr)
-    mind = np.full(T, np.nan)
-    np.minimum.at(mind, o, c.dist) if False else None
     mind = np.array([c.dist[c.ptr[t]] if n[t] else np.nan for t in range(T)])  # rows sorted by dist
     rank = np.arange(len(o)) - c.ptr[o]
     head, rel, speed, turn = raw_heading(ctx.xy, ctx.t)

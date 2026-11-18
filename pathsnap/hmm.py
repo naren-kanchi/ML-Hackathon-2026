@@ -50,6 +50,8 @@ class HMMParams:
 class NetDist:
     """Bounded single-source Dijkstra from nodes, with per-source cache."""
 
+    MAX_CACHE = 20000   # source nodes kept; cleared when exceeded (bounded memory on long trips)
+
     def __init__(self, rn):
         self.rn = rn
         self.cache = {}
@@ -76,6 +78,8 @@ class NetDist:
                     dist[v] = nd
                     pred[v] = a
                     heapq.heappush(h, (nd, v))
+        if len(self.cache) >= self.MAX_CACHE:
+            self.cache.clear()
         self.cache[n] = (limit, dist, pred)
         return dist, pred
 
@@ -90,6 +94,28 @@ class NetDist:
             arcs.append(a)
             v = self.rn.fr[a]
         return arcs[::-1]
+
+
+def pair_route_distance(rn, nd: NetDist, a1: int, s1: float, a2: int, s2: float, dt: float, p: HMMParams):
+    """Route distance of ONE decoded transition (a1,s1) -> (a2,s2), using exactly the
+    decoder's rules (same as _transition). Returns (distance or inf, kind) where kind is
+      'same'  same arc, moving forward (or within back_tol)
+      'loop'  same arc but further back: leave it and come round again via the network
+      'net'   different arcs
+      None    infeasible (no path within the speed limit)
+    Used by reconstruct_route and metrics.continuity so all three agree."""
+    limit = p.v_max * dt + p.slack
+    if a1 == a2 and s2 >= s1 - p.back_tol:
+        r = max(s2 - s1, 0.0)
+        return (r, "same") if r <= limit else (np.inf, None)
+    tail = rn.length[a1] - s1
+    if tail > limit:
+        return np.inf, None
+    dist, _ = nd.from_node(int(rn.to[a1]), limit - tail)
+    dd = dist.get(int(rn.fr[a2]))
+    if dd is None or tail + dd + s2 > limit:
+        return np.inf, None
+    return tail + dd + s2, ("loop" if a1 == a2 else "net")
 
 
 def _transition(ctx, nd: NetDist, prev_rows, cur_rows, dt, p: HMMParams):
@@ -171,11 +197,14 @@ def viterbi(ctx: TripContext, probs: np.ndarray, p: HMMParams = HMMParams(), nd:
 def reconstruct_route(ctx: TripContext, dec: dict, p: HMMParams = HMMParams()):
     """Arc sequence incl. connecting arcs between consecutive decoded fixes.
     Connectors are inserted only along the network path the decoder scored; at a
-    forced restart no connector is inserted and a break marker is recorded."""
+    forced restart no connector is inserted and a break marker is recorded.
+    A backward move on the same arc beyond back_tol is the decoder's 'loop'
+    transition (leave the arc and come round again): its connector arcs and the
+    repeated arc are appended, so the loop appears in the route."""
     rn, c, nd = ctx.rn, ctx.cands, dec["netdist"]
     restart_t = {t for t, _ in dec["restarts"]}
     route, breaks = [], 0
-    prev_t = None
+    prev_t = prev_r = None
     for t in range(ctx.T):
         r = dec["row"][t]
         if r < 0:
@@ -187,17 +216,18 @@ def reconstruct_route(ctx: TripContext, dec: dict, p: HMMParams = HMMParams()):
             if not route or route[-1] != a:
                 route.append(a)
         else:
-            pa = route[-1]
-            if a != pa:
-                dt = ctx.t[t] - ctx.t[prev_t]
+            pa = int(c.arc[prev_r])
+            dt = ctx.t[t] - ctx.t[prev_t]
+            _, kind = pair_route_distance(rn, nd, pa, float(c.offset[prev_r]), a, float(c.offset[r]), dt, p)
+            if kind != "same":
                 lim = p.v_max * dt + p.slack
-                conn = nd.path_arcs(int(rn.to[pa]), int(rn.fr[a]), lim)
+                conn = nd.path_arcs(int(rn.to[pa]), int(rn.fr[a]), lim) if kind is not None else None
                 if conn is None:
                     breaks += 1
                 else:
                     route.extend(int(x) for x in conn)
                 route.append(a)
-        prev_t = t
+        prev_t, prev_r = t, r
     return np.array(route, dtype=np.int64), breaks
 
 

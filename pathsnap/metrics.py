@@ -18,9 +18,10 @@ brier           Multiclass Brier over each fix's candidate set
                 sum_i (p_i - y_i)^2 ; a miss contributes sum p_i^2 + 1.
 miss_rate       Fraction of fixes whose derived label is not a candidate.
 continuity      Fraction of consecutive decoded fix pairs (both with predictions)
-                whose predicted transition is physically feasible on the DIRECTED
-                network: same arc moving forward (or within back_tol), or
-                to(a1)->from(a2) reachable with route distance <= v_max*dt + slack.
+                whose predicted transition is feasible under EXACTLY the decoder's
+                rules (hmm.pair_route_distance): same arc forward (or within
+                back_tol), same arc further back via a network loop, or different
+                arcs via the network; route distance must be <= v_max*dt + slack.
                 Connector insertion cannot raise this number: it is computed from
                 the per-fix arcs, not from the reconstructed route.
 restarts        Forced restarts of the Viterbi chain (gap / disconnected), excl. trip start.
@@ -29,6 +30,11 @@ route_p/r/f1    Length-weighted overlap between the reconstructed arc route and
                 traversals count twice).
 route_lcs       LCS(predicted, reference arc sequences) / len(reference): an
                 order-aware sequence metric.
+*_trim          Same, against only the stretch of the reference route between the
+                first and last route positions that GPS fixes were aligned to
+                (about 7-8% of route positions have no nearby fixes; they would cap
+                recall below 1 even for a perfect decoder).
+*_undir         Arc and its reverse twin counted as the same road.
 """
 from __future__ import annotations
 
@@ -36,7 +42,7 @@ from collections import Counter
 
 import numpy as np
 
-from .hmm import HMMParams, NetDist
+from .hmm import HMMParams, NetDist, pair_route_distance
 
 
 def per_fix_label_prob(cands, probs, labels):
@@ -69,31 +75,22 @@ def macro_f1_trip(pred, lab):
 
 
 def continuity(ctx, arcs, p: HMMParams = HMMParams(), nd: NetDist | None = None):
+    """Uses hmm.pair_route_distance, i.e. exactly the decoder's transition rules
+    (same-arc forward incl. the speed limit, same-arc 'loop' via the network,
+    different arcs via the network)."""
     rn = ctx.rn
     nd = nd or NetDist(rn)
     idx = np.nonzero(arcs >= 0)[0]
+    if len(idx) < 2:
+        return 1.0
+    _, off, _, _ = rn.project_points(ctx.xy[idx], arcs[idx])
     ok = 0
-    n = 0
-    xy = ctx.xy
-    for i0, i1 in zip(idx[:-1], idx[1:]):
-        a1, a2 = int(arcs[i0]), int(arcs[i1])
-        dt = ctx.t[i1] - ctx.t[i0]
-        n += 1
-        lim = p.v_max * dt + p.slack
-        if a1 == a2:
-            _, s1, _, _ = rn.project_points(xy[i0:i0 + 1], np.array([a1]))
-            _, s2, _, _ = rn.project_points(xy[i1:i1 + 1], np.array([a2]))
-            ok += bool(s2[0] >= s1[0] - p.back_tol)
-            continue
-        _, s1, _, _ = rn.project_points(xy[i0:i0 + 1], np.array([a1]))
-        _, s2, _, _ = rn.project_points(xy[i1:i1 + 1], np.array([a2]))
-        tail = rn.length[a1] - s1[0]
-        if tail > lim:
-            continue
-        dist, _ = nd.from_node(int(rn.to[a1]), lim - tail)
-        dd = dist.get(int(rn.fr[a2]))
-        ok += bool(dd is not None and tail + dd + s2[0] <= lim)
-    return ok / max(n, 1)
+    for k in range(len(idx) - 1):
+        i0, i1 = idx[k], idx[k + 1]
+        d, _ = pair_route_distance(rn, nd, int(arcs[i0]), float(off[k]), int(arcs[i1]), float(off[k + 1]),
+                                   float(ctx.t[i1] - ctx.t[i0]), p)
+        ok += bool(np.isfinite(d))
+    return ok / (len(idx) - 1)
 
 
 def _lcs(a, b):
@@ -113,20 +110,45 @@ def _lcs(a, b):
     return int(prev[-1])
 
 
-def route_metrics(rn, pred_route, ref_route_canon):
+def _overlap(L, pred_keys, ref_keys, pred_len, ref_len):
+    cp, cr = Counter(pred_keys), Counter(ref_keys)
+    lp, lr = Counter(), Counter()
+    for k, l in zip(pred_keys, pred_len):
+        lp[k] = l
+    for k, l in zip(ref_keys, ref_len):
+        lr[k] = l
+    inter = sum(min(cp[k], cr[k]) * lr[k] for k in cp if k in cr)
+    P_den = sum(lp[k] * v for k, v in cp.items())
+    R_den = sum(lr[k] * v for k, v in cr.items())
+    P = inter / P_den if P_den > 0 else 0.0
+    R = inter / R_den if R_den > 0 else 0.0
+    return P, R, (0.0 if P + R == 0 else 2 * P * R / (P + R))
+
+
+def route_metrics(rn, pred_route, ref_route_canon, covered=None):
+    """Length-weighted route precision/recall/F1 and order-aware LCS.
+    covered = (first, last) route positions that have GPS fixes aligned to them;
+    the *_trim metrics compare against ref[first:last+1] only, so reference
+    stretches with no GPS evidence do not cap recall. *_undir treats an arc and
+    its reverse twin as the same road (direction-agnostic)."""
     L = rn.length
-    cp, cr = Counter(pred_route.tolist()), Counter(ref_route_canon.tolist())
-    inter = sum(min(cp[k], cr[k]) * L[k] for k in cp)
-    lp = sum(L[k] * v for k, v in cp.items())
-    lr = sum(L[k] * v for k, v in cr.items())
-    P = inter / lp if lp > 0 else 0.0
-    R = inter / lr if lr > 0 else 0.0
     dedup = lambda x: [v for i, v in enumerate(x) if i == 0 or x[i - 1] != v]  # noqa: E731
-    return dict(route_p=P, route_r=R, route_f1=0 if P + R == 0 else 2 * P * R / (P + R),
-                route_lcs=_lcs(dedup(pred_route.tolist()), dedup(ref_route_canon.tolist())) / max(len(dedup(ref_route_canon.tolist())), 1))
+    und = lambda a: np.where(rn.reverse[a] >= 0, np.minimum(a, rn.reverse[a]), a)  # noqa: E731
+    out = {}
+    refs = {"": ref_route_canon}
+    if covered is not None:
+        refs["_trim"] = ref_route_canon[covered[0]:covered[1] + 1]
+    for tag, ref in refs.items():
+        P, R, F = _overlap(L, pred_route.tolist(), ref.tolist(), L[pred_route], L[ref])
+        out.update({f"route_p{tag}": P, f"route_r{tag}": R, f"route_f1{tag}": F,
+                    f"route_lcs{tag}": _lcs(dedup(pred_route.tolist()), dedup(ref.tolist())) / max(len(dedup(ref.tolist())), 1)})
+        Pu, Ru, Fu = _overlap(L, und(pred_route).tolist(), und(ref).tolist(), L[pred_route], L[ref])
+        out.update({f"route_p{tag}_undir": Pu, f"route_r{tag}_undir": Ru, f"route_f1{tag}_undir": Fu})
+    return out
 
 
-def evaluate_trip(ctx, probs, dec, labels, ambiguous, route_canon=None, pred_route=None, p=HMMParams()):
+def evaluate_trip(ctx, probs, dec, labels, ambiguous, route_canon=None, pred_route=None, p=HMMParams(),
+                  covered=None):
     arcs = dec["arc"]
     pl, hit = per_fix_label_prob(ctx.cands, probs, labels)
     correct = arcs == labels
@@ -142,5 +164,5 @@ def evaluate_trip(ctx, probs, dec, labels, ambiguous, route_canon=None, pred_rou
         restarts=sum(1 for _, r in dec["restarts"] if r != "start"),
     )
     if route_canon is not None and pred_route is not None:
-        out.update(route_metrics(ctx.rn, pred_route, route_canon))
+        out.update(route_metrics(ctx.rn, pred_route, route_canon, covered))
     return out

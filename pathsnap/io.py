@@ -17,7 +17,22 @@ from dataclasses import dataclass, field
 
 import numpy as np
 
-DATA_ROOT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "Student folder")
+_REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+def _default_data_root() -> str:
+    """$PATHSNAP_DATA if set, else the first of 'Student folder' / 'Dataset' in the
+    repo root that exists (both layouts are used by the team)."""
+    env = os.environ.get("PATHSNAP_DATA")
+    if env:
+        return env
+    for name in ("Student folder", "Dataset"):
+        if os.path.isdir(os.path.join(_REPO, name)):
+            return os.path.join(_REPO, name)
+    return os.path.join(_REPO, "Dataset")
+
+
+DATA_ROOT = _default_data_root()
 PARTITIONS = ("train", "student_test")
 
 

@@ -20,15 +20,18 @@ import numpy as np
 import torch
 from torch import nn
 
-K = 16
+from .candidates import MAX_K
+
+K = MAX_K   # padding width; pad() widens automatically if a fix has more candidates
 
 
 def pad(F: np.ndarray, ptr: np.ndarray, y_row: np.ndarray | None = None):
     """Flat candidate rows -> (n_fix, K, d) with mask; y_row = global row of label or -1."""
     T = len(ptr) - 1
     n = np.diff(ptr)
-    X = np.zeros((T, K, F.shape[1]), np.float32)
-    M = np.zeros((T, K), bool)
+    width = max(K, int(n.max()) if len(n) else 0)
+    X = np.zeros((T, width, F.shape[1]), np.float32)
+    M = np.zeros((T, width), bool)
     fix = np.repeat(np.arange(T), n)
     slot = np.arange(len(F)) - ptr[fix]
     X[fix, slot] = F
@@ -104,7 +107,7 @@ class ListwiseScorer:
         for i in range(0, len(X), 8192):
             Xb = torch.tensor(self._norm(X[i:i + 8192]) * M[i:i + 8192][..., None])
             out.append(self.model(Xb, torch.tensor(M[i:i + 8192])).numpy())
-        return np.concatenate(out) if out else np.zeros((0, K), np.float32)
+        return np.concatenate(out) if out else np.zeros((0, X.shape[1]), np.float32)
 
     def proba_from_logits(self, Z, M, T=None):
         T = self.temperature if T is None else T

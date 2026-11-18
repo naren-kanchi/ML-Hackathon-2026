@@ -14,7 +14,7 @@ from joblib import Parallel, delayed
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 sys.path.insert(0, ROOT)
 from pathsnap.context import prepare  # noqa: E402
-from pathsnap.io import PARTITIONS, list_trips, load_trip  # noqa: E402
+from pathsnap.io import DATA_ROOT, PARTITIONS, list_trips, load_trip  # noqa: E402
 from src.models.imm_2ekf.model1 import model1_features  # noqa: E402
 
 OUT = os.path.join(ROOT, "outputs", "cache", "m1")
@@ -47,7 +47,7 @@ if __name__ == "__main__":
         os.makedirs(os.path.join(OUT, part), exist_ok=True)
         jobs += [(part, t) for t in list_trips(part)]
     # largest first for load balance
-    jobs.sort(key=lambda j: -os.path.getsize(os.path.join(ROOT, "Student folder", j[0], j[1], j[1] + ".track")))
+    jobs.sort(key=lambda j: -os.path.getsize(os.path.join(DATA_ROOT, j[0], j[1], j[1] + ".track")))
     t0 = time.time()
     res = Parallel(n_jobs=14, verbose=5)(delayed(one)(*j) for j in jobs)
     print("total wall", round(time.time() - t0, 1), "s; sum cpu", round(sum(r[1] for r in res), 1))

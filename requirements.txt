@@ -20,3 +20,7 @@ scikit-optimize
 pyarrow
 fastapi
 uvicorn[standard]
+
+# pathsnap models (listwise scorer, GNN, RLCD) and parallel evaluation
+torch
+joblib
