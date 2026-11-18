@@ -62,7 +62,7 @@ Trips with gaps >60s: 23
 | extent_ns_km |  11.68 |  0.87 |  5.25 |  75.4  |
 | path_km      |  36.39 |  5.55 | 24.07 | 169.25 |
 
-## 8. Road-network size
+## 8. Road-network size(per trip)
 
 |                 |     mean |    min |      50% |       max |
 |:----------------|---------:|-------:|---------:|----------:|
