@@ -1,0 +1,494 @@
+{
+ "params": {
+  "sigma_z": 5.0,
+  "sa": 1.5,
+  "spsi_cv": 0.02,
+  "spsi_ct": 0.02,
+  "sw": 0.02,
+  "p_switch": 0.05
+ },
+ "fit_trips": [
+  "00000004",
+  "00000005",
+  "00000010",
+  "00000012",
+  "00000022",
+  "00000026",
+  "00000029",
+  "00000031",
+  "00000037",
+  "00000039",
+  "00000041",
+  "00000045",
+  "00000050",
+  "00000053",
+  "00000061",
+  "00000063",
+  "00000069",
+  "00000070",
+  "00000071",
+  "00000075",
+  "00000081",
+  "00000088",
+  "00000089",
+  "00000093"
+ ],
+ "grid_results": [
+  {
+   "sigma_z": 5.0,
+   "sa": 1.5,
+   "sw": 0.02,
+   "kind": "ekf",
+   "mean_loglik": -6.775456875317605
+  },
+  {
+   "sigma_z": 5.0,
+   "sa": 1.0,
+   "sw": 0.02,
+   "kind": "ekf",
+   "mean_loglik": -6.783995065618039
+  },
+  {
+   "sigma_z": 5.0,
+   "sa": 2.0,
+   "sw": 0.02,
+   "kind": "ekf",
+   "mean_loglik": -6.787425743524109
+  },
+  {
+   "sigma_z": 4.0,
+   "sa": 1.5,
+   "sw": 0.02,
+   "kind": "ekf",
+   "mean_loglik": -6.7954279090660625
+  },
+  {
+   "sigma_z": 4.0,
+   "sa": 2.0,
+   "sw": 0.02,
+   "kind": "ekf",
+   "mean_loglik": -6.795808343790013
+  },
+  {
+   "sigma_z": 5.0,
+   "sa": 1.0,
+   "sw": 0.05,
+   "kind": "ekf",
+   "mean_loglik": -6.812744733500469
+  },
+  {
+   "sigma_z": 4.0,
+   "sa": 1.0,
+   "sw": 0.02,
+   "kind": "ekf",
+   "mean_loglik": -6.81712302395204
+  },
+  {
+   "sigma_z": 4.0,
+   "sa": 2.0,
+   "sw": 0.05,
+   "kind": "ekf",
+   "mean_loglik": -6.8185858500691525
+  },
+  {
+   "sigma_z": 5.0,
+   "sa": 1.5,
+   "sw": 0.01,
+   "kind": "ekf",
+   "mean_loglik": -6.818632381597635
+  },
+  {
+   "sigma_z": 5.0,
+   "sa": 2.0,
+   "sw": 0.01,
+   "kind": "ekf",
+   "mean_loglik": -6.8381514165175625
+  },
+  {
+   "sigma_z": 4.0,
+   "sa": 2.0,
+   "sw": 0.01,
+   "kind": "ekf",
+   "mean_loglik": -6.847389124699082
+  },
+  {
+   "sigma_z": 5.0,
+   "sa": 1.0,
+   "sw": 0.01,
+   "kind": "ekf",
+   "mean_loglik": -6.848699951110906
+  },
+  {
+   "sigma_z": 6.0,
+   "sa": 1.5,
+   "sw": 0.02,
+   "kind": "ekf",
+   "mean_loglik": -6.849035318663649
+  },
+  {
+   "sigma_z": 4.0,
+   "sa": 1.5,
+   "sw": 0.01,
+   "kind": "ekf",
+   "mean_loglik": -6.852277766021576
+  },
+  {
+   "sigma_z": 5.0,
+   "sa": 3.0,
+   "sw": 0.02,
+   "kind": "ekf",
+   "mean_loglik": -6.863696080659629
+  },
+  {
+   "sigma_z": 4.0,
+   "sa": 3.0,
+   "sw": 0.01,
+   "kind": "ekf",
+   "mean_loglik": -6.870330020129415
+  },
+  {
+   "sigma_z": 6.0,
+   "sa": 1.0,
+   "sw": 0.02,
+   "kind": "ekf",
+   "mean_loglik": -6.870341433762369
+  },
+  {
+   "sigma_z": 6.0,
+   "sa": 1.0,
+   "sw": 0.05,
+   "kind": "ekf",
+   "mean_loglik": -6.874762453946161
+  },
+  {
+   "sigma_z": 5.0,
+   "sa": 3.0,
+   "sw": 0.01,
+   "kind": "ekf",
+   "mean_loglik": -6.8802453302036275
+  },
+  {
+   "sigma_z": 6.0,
+   "sa": 2.0,
+   "sw": 0.02,
+   "kind": "ekf",
+   "mean_loglik": -6.881365943091878
+  },
+  {
+   "sigma_z": 6.0,
+   "sa": 1.5,
+   "sw": 0.05,
+   "kind": "ekf",
+   "mean_loglik": -6.882922231957775
+  },
+  {
+   "sigma_z": 4.0,
+   "sa": 3.0,
+   "sw": 0.05,
+   "kind": "ekf",
+   "mean_loglik": -6.892806477084463
+  },
+  {
+   "sigma_z": 6.0,
+   "sa": 1.0,
+   "sw": 0.01,
+   "kind": "ekf",
+   "mean_loglik": -6.895979529228876
+  },
+  {
+   "sigma_z": 6.0,
+   "sa": 1.5,
+   "sw": 0.01,
+   "kind": "ekf",
+   "mean_loglik": -6.896154101824419
+  },
+  {
+   "sigma_z": 5.0,
+   "sa": 3.0,
+   "sw": 0.05,
+   "kind": "ekf",
+   "mean_loglik": -6.902190545255211
+  },
+  {
+   "sigma_z": 4.0,
+   "sa": 1.0,
+   "sw": 0.01,
+   "kind": "ekf",
+   "mean_loglik": -6.905518188803316
+  },
+  {
+   "sigma_z": 6.0,
+   "sa": 2.0,
+   "sw": 0.01,
+   "kind": "ekf",
+   "mean_loglik": -6.908638733007966
+  },
+  {
+   "sigma_z": 5.0,
+   "sa": 2.0,
+   "sw": 0.05,
+   "kind": "ekf",
+   "mean_loglik": -6.9086825616478915
+  },
+  {
+   "sigma_z": 6.0,
+   "sa": 2.0,
+   "sw": 0.05,
+   "kind": "ekf",
+   "mean_loglik": -6.913607059018074
+  },
+  {
+   "sigma_z": 4.0,
+   "sa": 3.0,
+   "sw": 0.02,
+   "kind": "ekf",
+   "mean_loglik": -6.918655132141317
+  },
+  {
+   "sigma_z": 5.0,
+   "sa": 1.5,
+   "sw": 0.05,
+   "kind": "ekf",
+   "mean_loglik": -6.921790001076383
+  },
+  {
+   "sigma_z": 4.0,
+   "sa": 1.5,
+   "sw": 0.05,
+   "kind": "ekf",
+   "mean_loglik": -6.938956572227957
+  },
+  {
+   "sigma_z": 6.0,
+   "sa": 3.0,
+   "sw": 0.02,
+   "kind": "ekf",
+   "mean_loglik": -6.954427349429391
+  },
+  {
+   "sigma_z": 6.0,
+   "sa": 3.0,
+   "sw": 0.01,
+   "kind": "ekf",
+   "mean_loglik": -6.970862232689979
+  },
+  {
+   "sigma_z": 4.0,
+   "sa": 1.0,
+   "sw": 0.05,
+   "kind": "ekf",
+   "mean_loglik": -7.025049294595758
+  },
+  {
+   "sigma_z": 3.0,
+   "sa": 3.0,
+   "sw": 0.02,
+   "kind": "ekf",
+   "mean_loglik": -7.031734068809539
+  },
+  {
+   "sigma_z": 6.0,
+   "sa": 3.0,
+   "sw": 0.05,
+   "kind": "ekf",
+   "mean_loglik": -7.055996639037346
+  },
+  {
+   "sigma_z": 3.0,
+   "sa": 3.0,
+   "sw": 0.01,
+   "kind": "ekf",
+   "mean_loglik": -7.070666283249596
+  },
+  {
+   "sigma_z": 3.0,
+   "sa": 1.5,
+   "sw": 0.02,
+   "kind": "ekf",
+   "mean_loglik": -7.085166924938018
+  },
+  {
+   "sigma_z": 3.0,
+   "sa": 2.0,
+   "sw": 0.01,
+   "kind": "ekf",
+   "mean_loglik": -7.1333356391117615
+  },
+  {
+   "sigma_z": 3.0,
+   "sa": 2.0,
+   "sw": 0.02,
+   "kind": "ekf",
+   "mean_loglik": -7.14953724295769
+  },
+  {
+   "sigma_z": 3.0,
+   "sa": 1.5,
+   "sw": 0.01,
+   "kind": "ekf",
+   "mean_loglik": -7.1711470477062065
+  },
+  {
+   "sigma_z": 3.0,
+   "sa": 2.0,
+   "sw": 0.05,
+   "kind": "ekf",
+   "mean_loglik": -7.174923903282998
+  },
+  {
+   "sigma_z": 3.0,
+   "sa": 1.0,
+   "sw": 0.02,
+   "kind": "ekf",
+   "mean_loglik": -7.182406351555341
+  },
+  {
+   "sigma_z": 6.0,
+   "sa": 2.0,
+   "sw": 0.15,
+   "kind": "ekf",
+   "mean_loglik": -7.204763268140496
+  },
+  {
+   "sigma_z": 5.0,
+   "sa": 3.0,
+   "sw": 0.15,
+   "kind": "ekf",
+   "mean_loglik": -7.264641559447218
+  },
+  {
+   "sigma_z": 3.0,
+   "sa": 1.0,
+   "sw": 0.01,
+   "kind": "ekf",
+   "mean_loglik": -7.273848683338091
+  },
+  {
+   "sigma_z": 3.0,
+   "sa": 1.5,
+   "sw": 0.05,
+   "kind": "ekf",
+   "mean_loglik": -7.313615186274187
+  },
+  {
+   "sigma_z": 5.0,
+   "sa": 2.0,
+   "sw": 0.15,
+   "kind": "ekf",
+   "mean_loglik": -7.359507179315091
+  },
+  {
+   "sigma_z": 3.0,
+   "sa": 1.0,
+   "sw": 0.05,
+   "kind": "ekf",
+   "mean_loglik": -7.413375422849546
+  },
+  {
+   "sigma_z": 6.0,
+   "sa": 3.0,
+   "sw": 0.15,
+   "kind": "ekf",
+   "mean_loglik": -7.601619859875352
+  },
+  {
+   "sigma_z": 3.0,
+   "sa": 3.0,
+   "sw": 0.05,
+   "kind": "ekf",
+   "mean_loglik": -7.641550979991256
+  },
+  {
+   "sigma_z": 4.0,
+   "sa": 3.0,
+   "sw": 0.15,
+   "kind": "ekf",
+   "mean_loglik": -7.712536314048411
+  },
+  {
+   "sigma_z": 4.0,
+   "sa": 2.0,
+   "sw": 0.15,
+   "kind": "ekf",
+   "mean_loglik": -7.795869946606134
+  },
+  {
+   "sigma_z": 6.0,
+   "sa": 1.5,
+   "sw": 0.15,
+   "kind": "ekf",
+   "mean_loglik": -7.862400296977268
+  },
+  {
+   "sigma_z": 5.0,
+   "sa": 1.5,
+   "sw": 0.15,
+   "kind": "ekf",
+   "mean_loglik": -7.945006620602523
+  },
+  {
+   "sigma_z": 3.0,
+   "sa": 2.0,
+   "sw": 0.15,
+   "kind": "ekf",
+   "mean_loglik": -8.3277155872273
+  },
+  {
+   "sigma_z": 3.0,
+   "sa": 3.0,
+   "sw": 0.15,
+   "kind": "ekf",
+   "mean_loglik": -8.340229251598712
+  },
+  {
+   "sigma_z": 4.0,
+   "sa": 1.5,
+   "sw": 0.15,
+   "kind": "ekf",
+   "mean_loglik": -8.9624164932723
+  },
+  {
+   "sigma_z": 5.0,
+   "sa": 1.0,
+   "sw": 0.15,
+   "kind": "ekf",
+   "mean_loglik": -9.0968336438923
+  },
+  {
+   "sigma_z": 3.0,
+   "sa": 1.5,
+   "sw": 0.15,
+   "kind": "ekf",
+   "mean_loglik": -9.384737645317562
+  },
+  {
+   "sigma_z": 6.0,
+   "sa": 1.0,
+   "sw": 0.15,
+   "kind": "ekf",
+   "mean_loglik": -9.463005542143536
+  },
+  {
+   "sigma_z": 4.0,
+   "sa": 1.0,
+   "sw": 0.15,
+   "kind": "ekf",
+   "mean_loglik": -11.363904621581687
+  },
+  {
+   "sigma_z": 3.0,
+   "sa": 1.0,
+   "sw": 0.15,
+   "kind": "ekf",
+   "mean_loglik": -13.11728440686374
+  }
+ ],
+ "imm_check": {
+  "sigma_z": 5.0,
+  "sa": 1.5,
+  "sw": 0.02,
+  "kind": "imm",
+  "mean_loglik": -6.681316613397122
+ },
+ "note": "sigma_z, sa, sw fitted (EKF predictive loglik, train only); spsi_cv, spsi_ct, p_switch fixed"
+}
