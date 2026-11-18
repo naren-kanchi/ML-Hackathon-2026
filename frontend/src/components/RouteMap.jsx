@@ -100,7 +100,7 @@ export default function RouteMap({ gpsPoints = EMPTY_DATA, predictedRoute = EMPT
         id: 'pathsnap-predicted-line',
         type: 'line',
         source: 'pathsnap-predicted-route',
-        paint: { 'line-color': '#22c55e', 'line-width': 5, 'line-opacity': 0.9 },
+        paint: { 'line-color': '#b6ff3b', 'line-width': 5, 'line-opacity': 0.9 },
       })
       updateSources(map, dataRef.current.gpsPoints, dataRef.current.routeLine)
       // The map sits in a dashboard panel; force a layout pass after its style loads.
@@ -116,11 +116,14 @@ export default function RouteMap({ gpsPoints = EMPTY_DATA, predictedRoute = EMPT
   }, [])
 
   useEffect(() => {
+    // isStyleLoaded() is false while any tile source is loading (e.g. right after a
+    // fitBounds or while panning), which used to skip the update for a new trip.
+    // The sources exist once the 'load' handler has run, so gate on that instead.
     const map = mapRef.current
-    if (map?.isStyleLoaded() && map.getSource('pathsnap-gps')) {
+    if (styleReady && map?.getSource('pathsnap-gps')) {
       updateSources(map, gpsPoints, routeLine)
     }
-  }, [gpsPoints, routeLine])
+  }, [gpsPoints, routeLine, styleReady])
 
   return (
     <div className="relative w-full h-full min-h-[420px] rounded-2xl overflow-hidden bg-[#0b1220]">
