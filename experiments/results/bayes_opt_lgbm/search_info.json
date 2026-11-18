@@ -1,0 +1,50 @@
+{
+ "model": "lgbm_ranker (LightGBM LambdaRank)",
+ "sampler": "optuna TPESampler(seed=20261118)",
+ "optuna_version": "5.1.0",
+ "lightgbm_version": "4.7.0",
+ "stageA": {
+  "objective": "mean 5-fold OOF observation Top-1, classifier-only",
+  "trials": 15,
+  "wall_s": 672.9542636871338,
+  "untuned_value": 0.9324098283691391,
+  "best_value": 0.9354857761214262,
+  "best": {
+   "n_estimators": 359,
+   "learning_rate": 0.027061062610699106,
+   "num_leaves": 26,
+   "min_child_samples": 88,
+   "subsample": 0.9652753837427582,
+   "colsample_bytree": 0.6850169904799472,
+   "reg_lambda": 10.183501636442735,
+   "reg_alpha": 0.0014796482844435072,
+   "min_split_gain": 0.11559294944307363
+  },
+  "untuned": {
+   "n_estimators": 500,
+   "learning_rate": 0.05,
+   "num_leaves": 31,
+   "min_child_samples": 50,
+   "subsample": 0.8,
+   "colsample_bytree": 0.8,
+   "reg_lambda": 0.0,
+   "reg_alpha": 0.0,
+   "min_split_gain": 0.0
+  }
+ },
+ "stageB": {
+  "objective": "mean 5-fold OOF observation Top-1 after HMM/Viterbi",
+  "trials": 6,
+  "wall_s": 94.52000904083252,
+  "untuned_value": 0.9635288363228444,
+  "best_value": 0.9674552852577161,
+  "best": {
+   "beta": 1.509987827743724,
+   "w_emit": 2.308614403556383,
+   "v_max": 54.863214347830535,
+   "slack": 50.0,
+   "back_tol": 20.28393758152038,
+   "gap_break_s": 94.4126410132493
+  }
+ }
+}
