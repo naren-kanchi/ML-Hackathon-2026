@@ -10,6 +10,7 @@ from typing import Any
 import joblib
 from fastapi import APIRouter, HTTPException
 
+from backend.services import lgbm_pipeline
 from backend.services.map_matching import evaluate_reference, predict_trip
 
 router = APIRouter(prefix="/api/v1", tags=["PathSnap"])
@@ -27,9 +28,37 @@ def _model_bundle() -> dict[str, Any]:
     return joblib.load(model_path)
 
 
+def _model_kind() -> str:
+    """PATHSNAP_MODEL=lgbm_tuned (default: selected, Bayesian-optimised LightGBM ranker +
+    tuned Viterbi) or hgb (the earlier HistGradientBoosting service)."""
+    import os
+    return os.environ.get("PATHSNAP_MODEL", "lgbm_tuned")
+
+
+def _default_data_root() -> Path:
+    for name in ("Dataset", "Student folder"):
+        if (REPO_ROOT / name).is_dir():
+            return REPO_ROOT / name
+    return REPO_ROOT / "Dataset"
+
+
+def _json_safe(x: Any) -> Any:
+    """NaN/inf are not valid JSON -> None; numpy scalars -> Python."""
+    import math
+    if isinstance(x, dict):
+        return {k: _json_safe(v) for k, v in x.items()}
+    if isinstance(x, (list, tuple)):
+        return [_json_safe(v) for v in x]
+    if hasattr(x, "item") and not isinstance(x, (str, bytes)):
+        x = x.item()
+    if isinstance(x, float) and not math.isfinite(x):
+        return None
+    return x
+
+
 def _partition_dir() -> Path:
     import os
-    data_root = Path(os.environ.get("PATHSNAP_DATA_DIR", str(REPO_ROOT / "Dataset"))).expanduser().resolve()
+    data_root = Path(os.environ.get("PATHSNAP_DATA_DIR", str(_default_data_root()))).expanduser().resolve()
     partition = os.environ.get("PATHSNAP_PARTITION", "student_test")
     if partition not in {"train", "student_test", "evaluator_test"}:
         raise ValueError("PATHSNAP_PARTITION must be train, student_test, or evaluator_test")
@@ -67,11 +96,16 @@ def predict(trip_id: str) -> dict[str, Any]:
     """Return classifier and Viterbi predictions, plus aggregate metrics only."""
     trip_dir = _trip_dir(trip_id)
     try:
+        kind = _model_kind()
         started = time.perf_counter()
-        prediction = predict_trip(trip_dir, _model_bundle())
+        if kind == "hgb":
+            prediction = predict_trip(trip_dir, _model_bundle())
+        else:
+            prediction = lgbm_pipeline.predict_trip(trip_dir, lgbm_pipeline.load_bundle())
         prediction["inference_time_seconds"] = time.perf_counter() - started
         # Reference route labels are loaded only after prediction completes.
-        metrics = evaluate_reference(prediction, trip_dir)
+        metrics = (evaluate_reference(prediction, trip_dir) if kind == "hgb"
+                   else lgbm_pipeline.evaluate(prediction, trip_dir))
     except FileNotFoundError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
     except (ValueError, OSError) as exc:
@@ -79,4 +113,4 @@ def predict(trip_id: str) -> dict[str, Any]:
     prediction.pop("_metadata", None)
     prediction["evaluation"] = metrics
     prediction["partition"] = _partition_dir().name
-    return prediction
+    return _json_safe(prediction)

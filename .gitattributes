@@ -1,0 +1,5 @@
+# Model files must keep their exact bytes (LightGBM text models break with CRLF)
+experiments/results/bayes_opt_lgbm/*.txt -text
+artifacts/models/**/*.txt -text
+*.joblib binary
+*.pt binary

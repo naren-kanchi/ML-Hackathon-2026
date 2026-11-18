@@ -1,0 +1,62 @@
+{
+ "model": "LightGBM LambdaRank (tuned)",
+ "booster": "booster.txt",
+ "features": [
+  "dist_m",
+  "dist_rank",
+  "dist_minus_min_m",
+  "n_candidates",
+  "heading_diff_deg",
+  "heading_valid",
+  "speed_mps",
+  "proj_frac",
+  "arc_length_m",
+  "bidirectional",
+  "to_out_degree",
+  "from_in_degree",
+  "dead_end",
+  "stop_s",
+  "is_stop",
+  "dt_prev_s",
+  "segment_start"
+ ],
+ "temperature": 0.9106711082059504,
+ "ranker_params": {
+  "n_estimators": 359,
+  "learning_rate": 0.027061062610699106,
+  "num_leaves": 26,
+  "min_child_samples": 88,
+  "subsample": 0.9652753837427582,
+  "colsample_bytree": 0.6850169904799472,
+  "reg_lambda": 10.183501636442735,
+  "reg_alpha": 0.0014796482844435072,
+  "min_split_gain": 0.11559294944307363
+ },
+ "hmm_params": {
+  "beta": 1.509987827743724,
+  "w_emit": 2.308614403556383,
+  "v_max": 54.863214347830535,
+  "slack": 50.0,
+  "back_tol": 20.28393758152038,
+  "gap_break_s": 94.4126410132493
+ },
+ "preprocess_config": {
+  "gap_split_s": 120.0,
+  "stat_window_s": 60.0,
+  "stat_box_m": 30.0,
+  "spike_speed_kmh": 250.0,
+  "min_dist_m": 10.0,
+  "min_segment_points": 3,
+  "label_max_dist_m": 50.0
+ },
+ "feature_config": {
+  "radius_m": 50.0,
+  "max_candidates": 8,
+  "densify_m": 5.0,
+  "route_cutoff_min_m": 300.0,
+  "route_cutoff_factor": 3.0,
+  "backtrack_tol_m": 10.0
+ },
+ "trained_on": "78 frozen-fold training trips (outputs/splits/folds.json)",
+ "source": "src/optimization/bayes_opt_lgbm.py -> experiments/results/bayes_opt_lgbm/"
+}
