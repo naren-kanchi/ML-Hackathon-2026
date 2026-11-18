@@ -31,3 +31,5 @@ outputs/labels/**/*.npz
 outputs/cache/
 outputs/preds/
 outputs/logs/
+data/predictions/
+data/scores/

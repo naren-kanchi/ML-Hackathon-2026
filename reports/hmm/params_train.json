@@ -1,0 +1,7 @@
+{
+ "sigma_m": 7.26181028931624,
+ "beta_m": 1.008366859989677,
+ "n_true_candidates": 116113,
+ "n_true_transitions": 115169,
+ "source_part": "train"
+}
