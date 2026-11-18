@@ -1,0 +1,2 @@
+model,family,key_config,cv_top1_mean,cv_top1_std,cv_logloss,st_top1,st_accuracy,st_precision,st_recall,st_f1,st_logloss,st_continuity_classifier,st_continuity_hmm,st_dir_f1_hmm,train_time_s,infer_us_per_row,model_size_mb
+lgbm_ranker,Boosting - learning to rank (LambdaRank),lambdarank; 500 trees; lr 0.05; 31 leaves; min_child 50; subsample 0.8; colsample 0.8; softmax T=0.949; no tuning,0.932857,0.0224104,0.065677,0.933658,0.976444,0.933658,0.935622,0.934639,0.0617297,0.922907,0.959878,0.950533,6.23019,4.73345,1.75099

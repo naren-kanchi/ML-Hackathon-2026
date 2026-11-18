@@ -24,3 +24,4 @@ uvicorn[standard]
 # pathsnap models (listwise scorer, GNN, RLCD) and parallel evaluation
 torch
 joblib
+lightgbm

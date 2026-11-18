@@ -1,0 +1,108 @@
+{
+ "model": "lgbm_ranker",
+ "family": "Boosting - learning to rank (LambdaRank)",
+ "timestamp": "2026-11-18T09:55:26+00:00",
+ "config": {
+  "objective": "lambdarank",
+  "metric": "ndcg",
+  "eval_at": [
+   1
+  ],
+  "n_estimators": 500,
+  "learning_rate": 0.05,
+  "num_leaves": 31,
+  "min_child_samples": 50,
+  "subsample": 0.8,
+  "subsample_freq": 1,
+  "colsample_bytree": 0.8,
+  "random_state": 42,
+  "n_jobs": -1,
+  "verbose": -1
+ },
+ "seeds": {
+  "model_random_state": 42,
+  "numpy": 42,
+  "shared_fold_seed": 20261118
+ },
+ "features": [
+  "dist_m",
+  "dist_rank",
+  "dist_minus_min_m",
+  "n_candidates",
+  "heading_diff_deg",
+  "heading_valid",
+  "speed_mps",
+  "proj_frac",
+  "arc_length_m",
+  "bidirectional",
+  "to_out_degree",
+  "from_in_degree",
+  "dead_end",
+  "stop_s",
+  "is_stop",
+  "dt_prev_s",
+  "segment_start"
+ ],
+ "folds_file": "outputs/splits/folds.json",
+ "cv_trips": 78,
+ "excluded_trips": [
+  "00000033",
+  "00000054"
+ ],
+ "rows": {
+  "train_all": 652676,
+  "train_labelled": 648162,
+  "student_test_all": 73985,
+  "student_test_labelled": 73953
+ },
+ "groups": {
+  "train_labelled": 116581,
+  "student_test_labelled": 13340,
+  "final_fit_train_groups": 114133
+ },
+ "dropped_training_groups_no_true_arc": {
+  "cv_folds": [
+   172,
+   337,
+   331,
+   323,
+   281
+  ],
+  "final_fit": 361
+ },
+ "temperature": 0.9487553919812238,
+ "temperature_per_fold_for_cv": [
+  0.9407,
+  0.9516,
+  0.9629,
+  0.968,
+  0.9195
+ ],
+ "timings": {
+  "train_time_per_fold_s": [
+   4.43,
+   4.97,
+   4.38,
+   4.59,
+   4.55
+  ],
+  "final_fit_s": 6.23,
+  "inference_total_s": 0.3502,
+  "inference_us_per_row": 4.733449901176774,
+  "inference_ms_per_trip": 35.020429093856364,
+  "student_test_rows_scored": 73985
+ },
+ "complexity": {
+  "n_trees": 500,
+  "total_leaves": 15500,
+  "model_file_mb": 1.750993
+ },
+ "library_versions": {
+  "python": "3.12.16",
+  "lightgbm": "4.7.0",
+  "numpy": "2.5.5",
+  "pandas": "3.1.1",
+  "scikit-learn": "1.9.1",
+  "scipy": "1.18.1"
+ }
+}
