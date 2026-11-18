@@ -18,3 +18,5 @@ tqdm
 tabulate
 scikit-optimize
 pyarrow
+fastapi
+uvicorn[standard]

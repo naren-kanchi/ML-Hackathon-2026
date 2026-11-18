@@ -49,3 +49,22 @@ The command writes `histgradientboosting.joblib` and `metrics.json`. Add `--tria
 The checked-in model and metrics were produced with seed 42, 80 training trips, five-fold GroupKFold by trip, and the 10 student-test trips. Five-trial Bayesian optimization selected learning_rate=0.03846, max_iter=210, max_leaf_nodes=60, min_samples_leaf=10, and l2_regularization=9.4762. Tuned CV candidate-level macro F1 was 0.9181; student-test candidate-level macro F1 was 0.9102 (accuracy 0.9840, log loss 0.0426). Candidate miss rates were 0.11% (train) and 0.22% (student test). These are candidate classification results, not route-level accuracy. Route labels are ordered arc sequences; the implementation projects each route arc to its nearest GPS sample using the arc midpoint and records candidate misses separately.
 
 This is one model experiment. The hackathon instructions also require at least five model comparisons, route decoding, API/UI work, and a technical report; those components are not claimed as complete here. Do not present unrun experiments as results.
+
+## Backend API
+
+The FastAPI backend loads the committed model artifact and reads trip files from a server-side data directory. Prediction uses only `.track`, `.nodes`, and `.arcs`; a `.route` file, when present for development evaluation, is read only after inference and is never returned. The evaluator partition and its reference labels must remain on the server.
+
+### Start the API
+
+Install the dependencies and point the service at the extracted dataset folder that contains `train/` and `student_test/`:
+
+```powershell
+python -m pip install -r requirements.txt
+$env:PATHSNAP_DATA_DIR = "C:\path\to\Student folder"
+$env:PATHSNAP_PARTITION = "student_test"
+uvicorn backend.main:app --host 0.0.0.0 --port 8000
+```
+
+The browser API is documented at `http://localhost:8000/docs`. `GET /api/v1/trips` lists available trip IDs. `GET /api/v1/trips/{trip_id}` returns classifier-only and Viterbi arc predictions, observed GPS points, route geometry, route continuity, and aggregate metrics if server-side reference labels are available. Reference labels are never included in the response.
+
+For evaluator deployment, set `PATHSNAP_DATA_DIR` to the server-only evaluator dataset and `PATHSNAP_PARTITION=evaluator_test`. Set `PATHSNAP_CORS_ORIGINS` to the UI origin(s), comma separated. For a second laptop, set the browser's `window.PATHSNAP_API_BASE_URL` to `http://<api-laptop-lan-address>:8000` before loading `frontend/src/pathsnap-api.js`. The helper exports `pathsnapApi.listTrips()` and `pathsnapApi.predictTrip(tripId)`.
