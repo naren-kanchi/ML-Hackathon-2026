@@ -12,7 +12,7 @@ Extract the supplied student archive so the directory passed to `--data` contain
 
 ```powershell
 python -m pip install -r requirements.txt
-python src/models/train_histgradientboosting.py --data path/to/student-data --output artifacts/models
+python src/models/histgradientboosting/train_histgradientboosting.py --data path/to/student-data --output artifacts/models
 ```
 
 The command writes `histgradientboosting.joblib` and `metrics.json`. Add `--trials 5` to run Gaussian-process Bayesian optimization over learning rate, iterations, leaf count, minimum leaf samples, and L2 regularization. The objective is mean trip-grouped CV macro F1. Trial results are written into the metrics JSON.
