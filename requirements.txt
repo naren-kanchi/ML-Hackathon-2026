@@ -1,0 +1,17 @@
+numpy
+pandas
+scipy
+matplotlib
+seaborn
+
+geopandas
+shapely
+pyproj
+folium
+
+networkx
+scikit-learn
+
+jupyterlab
+ipykernel
+tqdm
