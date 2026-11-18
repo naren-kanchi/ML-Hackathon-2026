@@ -1,0 +1,42 @@
+{
+ "params": {
+  "C": 1.0,
+  "scaler": "StandardScaler",
+  "solver": "lbfgs",
+  "max_iter": 1000,
+  "random_state": 42
+ },
+ "timing": [
+  {
+   "fold": 0,
+   "fit_s": 1.872040033340454,
+   "rows": 362409
+  },
+  {
+   "fold": 1,
+   "fit_s": 0.9507894515991211,
+   "rows": 395567
+  },
+  {
+   "fold": 2,
+   "fit_s": 0.8254845142364502,
+   "rows": 358088
+  },
+  {
+   "fold": 3,
+   "fit_s": 0.8491003513336182,
+   "rows": 355927
+  },
+  {
+   "fold": 4,
+   "fit_s": 0.9271862506866455,
+   "rows": 370489
+  },
+  {
+   "fold": "all80",
+   "fit_s": 1.0886437892913818,
+   "rows": 472259
+  }
+ ],
+ "note": "team features/candidates/labels for training; shared labels, decoder and metrics for evaluation"
+}

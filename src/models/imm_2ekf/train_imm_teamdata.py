@@ -166,6 +166,10 @@ def run_variant(name, tabs, folds, st_tabs):
     cv_rows = [trip_metrics(tabs[t], o[2], unpad(helper.proba_from_logits(o[0], o[1], T), o[2]), o[3]) | {"trip": t}
                for t, o in oof.items()]
     cv_agg, cv_df = aggregate(cv_rows)
+    pred_dir = os.path.join(ROOT, "outputs", "preds", f"imm_teamdata_{name}")
+    os.makedirs(pred_dir, exist_ok=True)
+    for t, o in oof.items():   # calibrated OOF probabilities per candidate row (for the HMM)
+        np.save(os.path.join(pred_dir, f"oof_{t}.npy"), unpad(helper.proba_from_logits(o[0], o[1], T), o[2]))
     # refit on all CV trips -> student test
     all_tr = sorted(sum(folds, []))
     Xs, Ms, ys = zip(*[to_padded(tabs[t], train=True)[:3] for t in all_tr])
@@ -178,6 +182,7 @@ def run_variant(name, tabs, folds, st_tabs):
         P = final.predict_proba_padded(X, M)
         t_inf += time.time() - t0
         st_rows.append(trip_metrics(tab, ptr, unpad(P, ptr), lab_ok) | {"trip": t})
+        np.save(os.path.join(pred_dir, f"st_{t}.npy"), unpad(P, ptr))
     st_agg, st_df = aggregate(st_rows)
     return dict(final=final, T=T, oof_nll=(n1, nT), cv=cv_agg, cv_df=cv_df, st=st_agg, st_df=st_df,
                 folds=fold_rows, hist=hist, cv_s=cv_s, final_train_s=final.train_time, st_score_s=t_inf)

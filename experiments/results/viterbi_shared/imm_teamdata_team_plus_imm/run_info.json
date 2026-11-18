@@ -1,0 +1,3 @@
+{
+ "note": "team-labelled points only (true_arc >= 0); probabilities from src/models/imm_2ekf/train_imm_teamdata.py (calibrated OOF / refit)"
+}
