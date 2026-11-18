@@ -1,15 +1,18 @@
-
 @import "tailwindcss";
 
-* {
-  box-sizing: border-box;
+:root {
+  color-scheme: dark;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  background: #050606;
+  color: #f4f4f5;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
 
-body {
-  margin: 0;
-  min-width: 320px;
-  min-height: 100vh;
-  font-family: Inter, system-ui, sans-serif;
-  background: #080d18;
-  color: #f1f5f9;
-}
+* { box-sizing: border-box; }
+
+html { min-width: 320px; min-height: 100%; background: #050606; }
+body { margin: 0; min-width: 320px; min-height: 100vh; background: #050606; }
+button { font: inherit; }
+::selection { color: #050606; background: #b6ff3b; }
