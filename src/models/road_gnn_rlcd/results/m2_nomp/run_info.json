@@ -1,0 +1,8 @@
+{
+ "variant": "nomp",
+ "params": 14209,
+ "cv_wall_s": 1589.2996079921722,
+ "final_train_s": 423.7237331867218,
+ "st_scoring_s": 2.103151559829712,
+ "chosen_window_s": 15.0
+}

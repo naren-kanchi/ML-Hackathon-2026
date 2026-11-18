@@ -1,0 +1,34 @@
+{
+ "variant": "mp",
+ "windows_s": [
+  0.0,
+  5.0,
+  15.0
+ ],
+ "fixed_window_raw": 15.0,
+ "fixed_window_cal": 15.0,
+ "temperatures": [
+  1.1716723220969758,
+  1.093208931787019,
+  1.0610557279109303
+ ],
+ "state_features": [
+  "hist_avail",
+  "max_dt_15s",
+  "raw_speed",
+  "raw_rel",
+  "n_cands",
+  "d1",
+  "d2_minus_d1",
+  "maxp_a0",
+  "entropy_a0",
+  "agree_a0",
+  "maxp_a1",
+  "entropy_a1",
+  "agree_a1",
+  "maxp_a2",
+  "entropy_a2",
+  "agree_a2"
+ ],
+ "wall_s": 382.27239656448364
+}

@@ -1,0 +1,8 @@
+{
+ "variant": "mp",
+ "params": 18945,
+ "cv_wall_s": 1790.8885791301727,
+ "final_train_s": 400.50681734085083,
+ "st_scoring_s": 1.2120826244354248,
+ "chosen_window_s": 15.0
+}
