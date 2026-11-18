@@ -16,3 +16,4 @@ jupyterlab
 ipykernel
 tqdm
 tabulate
+scikit-optimize

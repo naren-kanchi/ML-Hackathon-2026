@@ -1,0 +1,1132 @@
+{
+  "model": "HistGradientBoostingClassifier",
+  "seed": 42,
+  "features": [
+    "distance_m",
+    "heading_error_rad",
+    "gps_speed_mps",
+    "gps_bearing_sin",
+    "gps_bearing_cos",
+    "segment_length_m",
+    "segment_bearing_sin",
+    "segment_bearing_cos",
+    "candidate_degree_from",
+    "candidate_degree_to",
+    "endpoint_min_distance_m",
+    "endpoint_max_distance_m",
+    "time_delta_s"
+  ],
+  "parameters": {
+    "loss": "log_loss",
+    "learning_rate": 0.03846173685406504,
+    "max_iter": 210,
+    "max_leaf_nodes": 60,
+    "l2_regularization": 9.476210031010524,
+    "min_samples_leaf": 10,
+    "random_state": 42
+  },
+  "training_rows": 472259,
+  "training_trips": 80,
+  "student_test_rows": 61611,
+  "cv": {
+    "split": "GroupKFold by trip",
+    "folds": [
+      {
+        "fold": 1,
+        "validation_trips": [
+          "00000006",
+          "00000011",
+          "00000021",
+          "00000025",
+          "00000036",
+          "00000046",
+          "00000048",
+          "00000051",
+          "00000061",
+          "00000062",
+          "00000070",
+          "00000081",
+          "00000092",
+          "00000096",
+          "00000097"
+        ],
+        "accuracy": 0.9802216448380083,
+        "macro_f1": 0.9170175184531284,
+        "log_loss": 0.05583049324717264,
+        "fit_seconds": 7.219081900082529
+      },
+      {
+        "fold": 2,
+        "validation_trips": [
+          "00000008",
+          "00000013",
+          "00000016",
+          "00000024",
+          "00000026",
+          "00000041",
+          "00000043",
+          "00000057",
+          "00000069",
+          "00000074",
+          "00000075",
+          "00000078",
+          "00000080",
+          "00000082",
+          "00000095",
+          "00000098"
+        ],
+        "accuracy": 0.9793052319423851,
+        "macro_f1": 0.9144392370789107,
+        "log_loss": 0.058214471276834774,
+        "fit_seconds": 6.819427500013262
+      },
+      {
+        "fold": 3,
+        "validation_trips": [
+          "00000001",
+          "00000004",
+          "00000005",
+          "00000020",
+          "00000028",
+          "00000029",
+          "00000031",
+          "00000033",
+          "00000037",
+          "00000042",
+          "00000050",
+          "00000055",
+          "00000058",
+          "00000064",
+          "00000085",
+          "00000086",
+          "00000090"
+        ],
+        "accuracy": 0.9845955404248121,
+        "macro_f1": 0.9380520380878885,
+        "log_loss": 0.04224526970545698,
+        "fit_seconds": 6.893720000050962
+      },
+      {
+        "fold": 4,
+        "validation_trips": [
+          "00000002",
+          "00000012",
+          "00000018",
+          "00000019",
+          "00000034",
+          "00000035",
+          "00000039",
+          "00000044",
+          "00000054",
+          "00000060",
+          "00000068",
+          "00000071",
+          "00000072",
+          "00000079",
+          "00000084",
+          "00000099"
+        ],
+        "accuracy": 0.980951776246865,
+        "macro_f1": 0.9061581847854648,
+        "log_loss": 0.04997160482647392,
+        "fit_seconds": 6.772235299926251
+      },
+      {
+        "fold": 5,
+        "validation_trips": [
+          "00000003",
+          "00000010",
+          "00000014",
+          "00000022",
+          "00000027",
+          "00000032",
+          "00000038",
+          "00000045",
+          "00000047",
+          "00000053",
+          "00000063",
+          "00000066",
+          "00000083",
+          "00000088",
+          "00000089",
+          "00000093"
+        ],
+        "accuracy": 0.9844596883468835,
+        "macro_f1": 0.9148323585648392,
+        "log_loss": 0.041175192968456925,
+        "fit_seconds": 6.8973598999436945
+      }
+    ],
+    "mean_macro_f1": 0.9180998673940464
+  },
+  "student_test": {
+    "candidate_accuracy": 0.9839801334177338,
+    "candidate_macro_f1": 0.9101956870474295,
+    "candidate_log_loss": 0.042579299135992156,
+    "inference_seconds": 0.16480319993570447,
+    "candidate_rows": 61611,
+    "positive_candidate_rate": 0.04669620684618007
+  },
+  "training_seconds": 8.104301600018516,
+  "bayesian_trials": [
+    {
+      "params": {
+        "learning_rate": 0.14948144802903496,
+        "max_iter": 113,
+        "max_leaf_nodes": 52,
+        "min_samples_leaf": 52,
+        "l2_regularization": 0.2175195311877766
+      },
+      "mean_cv_macro_f1": 0.9163271117246101
+    },
+    {
+      "params": {
+        "learning_rate": 0.044996237372700434,
+        "max_iter": 163,
+        "max_leaf_nodes": 31,
+        "min_samples_leaf": 20,
+        "l2_regularization": 0.8967376801947966
+      },
+      "mean_cv_macro_f1": 0.9177961260684295
+    },
+    {
+      "params": {
+        "learning_rate": 0.03846173685406504,
+        "max_iter": 210,
+        "max_leaf_nodes": 60,
+        "min_samples_leaf": 10,
+        "l2_regularization": 9.476210031010524
+      },
+      "mean_cv_macro_f1": 0.9180998673940464
+    },
+    {
+      "params": {
+        "learning_rate": 0.12262222644415749,
+        "max_iter": 190,
+        "max_leaf_nodes": 15,
+        "min_samples_leaf": 12,
+        "l2_regularization": 0.375252833957398
+      },
+      "mean_cv_macro_f1": 0.9163887593810198
+    },
+    {
+      "params": {
+        "learning_rate": 0.08997914575728833,
+        "max_iter": 88,
+        "max_leaf_nodes": 62,
+        "min_samples_leaf": 26,
+        "l2_regularization": 0.018699039697141494
+      },
+      "mean_cv_macro_f1": 0.917670190977599
+    }
+  ],
+  "data_quality": {
+    "train_trip_inventory": [
+      {
+        "trip": "00000001",
+        "gps": 1315,
+        "route": 525,
+        "labelled_observations": 480,
+        "rows": 9993,
+        "candidate_misses": 1,
+        "miss_rate": 0.0020833333333333333,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000002",
+        "gps": 7243,
+        "route": 262,
+        "labelled_observations": 261,
+        "rows": 6240,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000003",
+        "gps": 821,
+        "route": 79,
+        "labelled_observations": 77,
+        "rows": 2553,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000004",
+        "gps": 1064,
+        "route": 320,
+        "labelled_observations": 264,
+        "rows": 2589,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000005",
+        "gps": 1045,
+        "route": 105,
+        "labelled_observations": 105,
+        "rows": 310,
+        "candidate_misses": 1,
+        "miss_rate": 0.009523809523809525,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000006",
+        "gps": 1450,
+        "route": 261,
+        "labelled_observations": 200,
+        "rows": 3980,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000008",
+        "gps": 3093,
+        "route": 173,
+        "labelled_observations": 148,
+        "rows": 2826,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000010",
+        "gps": 2711,
+        "route": 210,
+        "labelled_observations": 198,
+        "rows": 4625,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000011",
+        "gps": 2828,
+        "route": 565,
+        "labelled_observations": 283,
+        "rows": 3499,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000012",
+        "gps": 1608,
+        "route": 205,
+        "labelled_observations": 204,
+        "rows": 1086,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000013",
+        "gps": 2580,
+        "route": 788,
+        "labelled_observations": 720,
+        "rows": 10140,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000014",
+        "gps": 448,
+        "route": 164,
+        "labelled_observations": 140,
+        "rows": 4066,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000016",
+        "gps": 1305,
+        "route": 204,
+        "labelled_observations": 187,
+        "rows": 4524,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000018",
+        "gps": 379,
+        "route": 166,
+        "labelled_observations": 134,
+        "rows": 3886,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000019",
+        "gps": 2354,
+        "route": 545,
+        "labelled_observations": 524,
+        "rows": 8855,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000020",
+        "gps": 2353,
+        "route": 142,
+        "labelled_observations": 134,
+        "rows": 677,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000021",
+        "gps": 15783,
+        "route": 277,
+        "labelled_observations": 277,
+        "rows": 1041,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000022",
+        "gps": 474,
+        "route": 376,
+        "labelled_observations": 240,
+        "rows": 6152,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000024",
+        "gps": 801,
+        "route": 249,
+        "labelled_observations": 247,
+        "rows": 2661,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000025",
+        "gps": 1179,
+        "route": 283,
+        "labelled_observations": 281,
+        "rows": 4684,
+        "candidate_misses": 1,
+        "miss_rate": 0.0035587188612099642,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000026",
+        "gps": 361,
+        "route": 197,
+        "labelled_observations": 135,
+        "rows": 2341,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000027",
+        "gps": 694,
+        "route": 138,
+        "labelled_observations": 136,
+        "rows": 1690,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000028",
+        "gps": 3565,
+        "route": 618,
+        "labelled_observations": 589,
+        "rows": 7439,
+        "candidate_misses": 7,
+        "miss_rate": 0.011884550084889643,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000029",
+        "gps": 733,
+        "route": 204,
+        "labelled_observations": 193,
+        "rows": 4948,
+        "candidate_misses": 1,
+        "miss_rate": 0.0051813471502590676,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000031",
+        "gps": 4245,
+        "route": 432,
+        "labelled_observations": 429,
+        "rows": 6165,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000032",
+        "gps": 2464,
+        "route": 819,
+        "labelled_observations": 754,
+        "rows": 9626,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000033",
+        "gps": 5844,
+        "route": 169,
+        "labelled_observations": 149,
+        "rows": 4152,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000034",
+        "gps": 3614,
+        "route": 454,
+        "labelled_observations": 424,
+        "rows": 4668,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000035",
+        "gps": 1643,
+        "route": 403,
+        "labelled_observations": 376,
+        "rows": 9302,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000036",
+        "gps": 1368,
+        "route": 156,
+        "labelled_observations": 139,
+        "rows": 2799,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000037",
+        "gps": 677,
+        "route": 163,
+        "labelled_observations": 162,
+        "rows": 3244,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000038",
+        "gps": 1287,
+        "route": 221,
+        "labelled_observations": 218,
+        "rows": 5115,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000039",
+        "gps": 363,
+        "route": 161,
+        "labelled_observations": 131,
+        "rows": 1021,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000041",
+        "gps": 1019,
+        "route": 340,
+        "labelled_observations": 297,
+        "rows": 7108,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000042",
+        "gps": 7739,
+        "route": 1440,
+        "labelled_observations": 1326,
+        "rows": 18496,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000043",
+        "gps": 2322,
+        "route": 427,
+        "labelled_observations": 411,
+        "rows": 4707,
+        "candidate_misses": 17,
+        "miss_rate": 0.0413625304136253,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000044",
+        "gps": 546,
+        "route": 130,
+        "labelled_observations": 123,
+        "rows": 2227,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000045",
+        "gps": 640,
+        "route": 59,
+        "labelled_observations": 57,
+        "rows": 560,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000046",
+        "gps": 1401,
+        "route": 66,
+        "labelled_observations": 62,
+        "rows": 676,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000047",
+        "gps": 1272,
+        "route": 188,
+        "labelled_observations": 188,
+        "rows": 3629,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000048",
+        "gps": 1240,
+        "route": 149,
+        "labelled_observations": 117,
+        "rows": 1770,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000050",
+        "gps": 518,
+        "route": 94,
+        "labelled_observations": 91,
+        "rows": 1068,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000051",
+        "gps": 984,
+        "route": 299,
+        "labelled_observations": 286,
+        "rows": 5342,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000053",
+        "gps": 1304,
+        "route": 754,
+        "labelled_observations": 616,
+        "rows": 16189,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000054",
+        "gps": 19313,
+        "route": 422,
+        "labelled_observations": 399,
+        "rows": 7487,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000055",
+        "gps": 2472,
+        "route": 475,
+        "labelled_observations": 465,
+        "rows": 3600,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000057",
+        "gps": 1645,
+        "route": 300,
+        "labelled_observations": 291,
+        "rows": 4010,
+        "candidate_misses": 1,
+        "miss_rate": 0.003436426116838488,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000058",
+        "gps": 599,
+        "route": 345,
+        "labelled_observations": 247,
+        "rows": 8517,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000060",
+        "gps": 854,
+        "route": 520,
+        "labelled_observations": 413,
+        "rows": 11712,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000061",
+        "gps": 1430,
+        "route": 296,
+        "labelled_observations": 209,
+        "rows": 6823,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000062",
+        "gps": 3378,
+        "route": 497,
+        "labelled_observations": 490,
+        "rows": 8328,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000063",
+        "gps": 2781,
+        "route": 565,
+        "labelled_observations": 526,
+        "rows": 7775,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000064",
+        "gps": 2093,
+        "route": 692,
+        "labelled_observations": 642,
+        "rows": 10806,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000066",
+        "gps": 4325,
+        "route": 365,
+        "labelled_observations": 365,
+        "rows": 1801,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000068",
+        "gps": 747,
+        "route": 240,
+        "labelled_observations": 230,
+        "rows": 4017,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000069",
+        "gps": 2067,
+        "route": 467,
+        "labelled_observations": 402,
+        "rows": 8459,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000070",
+        "gps": 2076,
+        "route": 149,
+        "labelled_observations": 145,
+        "rows": 2444,
+        "candidate_misses": 1,
+        "miss_rate": 0.006896551724137931,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000071",
+        "gps": 850,
+        "route": 186,
+        "labelled_observations": 184,
+        "rows": 2649,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000072",
+        "gps": 969,
+        "route": 131,
+        "labelled_observations": 123,
+        "rows": 2814,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000074",
+        "gps": 1929,
+        "route": 305,
+        "labelled_observations": 285,
+        "rows": 5948,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000075",
+        "gps": 1628,
+        "route": 108,
+        "labelled_observations": 88,
+        "rows": 1103,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000078",
+        "gps": 2909,
+        "route": 1765,
+        "labelled_observations": 1533,
+        "rows": 21215,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000079",
+        "gps": 689,
+        "route": 182,
+        "labelled_observations": 158,
+        "rows": 5048,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000080",
+        "gps": 2510,
+        "route": 139,
+        "labelled_observations": 137,
+        "rows": 929,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000081",
+        "gps": 3224,
+        "route": 778,
+        "labelled_observations": 608,
+        "rows": 9153,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000082",
+        "gps": 4268,
+        "route": 204,
+        "labelled_observations": 201,
+        "rows": 3736,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000083",
+        "gps": 1507,
+        "route": 143,
+        "labelled_observations": 143,
+        "rows": 3378,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000084",
+        "gps": 16031,
+        "route": 627,
+        "labelled_observations": 610,
+        "rows": 5604,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000085",
+        "gps": 1092,
+        "route": 170,
+        "labelled_observations": 165,
+        "rows": 2192,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000086",
+        "gps": 4143,
+        "route": 671,
+        "labelled_observations": 664,
+        "rows": 4554,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000088",
+        "gps": 876,
+        "route": 163,
+        "labelled_observations": 157,
+        "rows": 5496,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000089",
+        "gps": 1228,
+        "route": 265,
+        "labelled_observations": 243,
+        "rows": 8620,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000090",
+        "gps": 536,
+        "route": 235,
+        "labelled_observations": 209,
+        "rows": 5833,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000092",
+        "gps": 7892,
+        "route": 2266,
+        "labelled_observations": 2140,
+        "rows": 33439,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000093",
+        "gps": 1211,
+        "route": 590,
+        "labelled_observations": 451,
+        "rows": 13189,
+        "candidate_misses": 2,
+        "miss_rate": 0.004434589800443459,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000095",
+        "gps": 1551,
+        "route": 306,
+        "labelled_observations": 229,
+        "rows": 5459,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000096",
+        "gps": 3271,
+        "route": 456,
+        "labelled_observations": 428,
+        "rows": 4475,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000097",
+        "gps": 1740,
+        "route": 444,
+        "labelled_observations": 428,
+        "rows": 5842,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000098",
+        "gps": 5584,
+        "route": 1003,
+        "labelled_observations": 989,
+        "rows": 9254,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000099",
+        "gps": 2322,
+        "route": 886,
+        "labelled_observations": 837,
+        "rows": 17881,
+        "candidate_misses": 1,
+        "miss_rate": 0.0011947431302270011,
+        "median_interval_s": 1.0
+      }
+    ],
+    "student_test_trip_inventory": [
+      {
+        "trip": "00000000",
+        "gps": 2503,
+        "route": 179,
+        "labelled_observations": 176,
+        "rows": 1540,
+        "candidate_misses": 1,
+        "miss_rate": 0.005681818181818182,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000007",
+        "gps": 1354,
+        "route": 123,
+        "labelled_observations": 123,
+        "rows": 684,
+        "candidate_misses": 1,
+        "miss_rate": 0.008130081300813009,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000009",
+        "gps": 1049,
+        "route": 429,
+        "labelled_observations": 386,
+        "rows": 10816,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000040",
+        "gps": 2995,
+        "route": 309,
+        "labelled_observations": 303,
+        "rows": 2648,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000052",
+        "gps": 262,
+        "route": 95,
+        "labelled_observations": 77,
+        "rows": 1214,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000056",
+        "gps": 3958,
+        "route": 1323,
+        "labelled_observations": 897,
+        "rows": 21738,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000065",
+        "gps": 768,
+        "route": 145,
+        "labelled_observations": 129,
+        "rows": 3417,
+        "candidate_misses": 1,
+        "miss_rate": 0.007751937984496124,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000076",
+        "gps": 1486,
+        "route": 374,
+        "labelled_observations": 349,
+        "rows": 11135,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000077",
+        "gps": 3911,
+        "route": 268,
+        "labelled_observations": 248,
+        "rows": 4174,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      },
+      {
+        "trip": "00000091",
+        "gps": 874,
+        "route": 232,
+        "labelled_observations": 192,
+        "rows": 4245,
+        "candidate_misses": 0,
+        "miss_rate": 0.0,
+        "median_interval_s": 1.0
+      }
+    ],
+    "train_mean_candidate_miss_rate": 0.0011194575017346715,
+    "student_test_mean_candidate_miss_rate": 0.0021563837467127316
+  },
+  "label_note": "Binary candidate-level classification: a candidate arc is positive when it matches the trip-local reference route arc projected to that GPS observation. Trip-local arc IDs are never treated as global classes. Metrics are candidate classification metrics, not observation-level route accuracy."
+}
