@@ -1,5 +1,32 @@
 # ML-Hackathon-2026
 
+## Data pipeline
+
+The processed data and features are not stored in the repository. Rebuild them locally from the raw dataset.
+
+**Prerequisites**
+
+- The raw dataset must be in `Dataset/train` and `Dataset/student_test`. It is not committed to the repository.
+- Python environment set up:
+
+  ```bash
+  python3 -m venv .venv
+  source .venv/bin/activate
+  pip install -r requirements.txt
+  ```
+
+**Rebuild** (run from the repository root):
+
+```bash
+# 1. Preprocess raw trips -> data/processed/
+python -m src.data.preprocess Dataset data/processed
+
+# 2. Build features -> data/features/
+python -m src.features.build_features data/processed data/features
+```
+
+Both output folders are git-ignored. Small summaries of each run (`preprocess_summary.csv`, `preprocess_config.json`, `feature_summary.csv`, `feature_config.json`) are kept in `reports/features/`.
+
 ## HistGradientBoosting candidate classifier
 
 This implementation trains a binary HistGradientBoosting classifier that scores whether a road-arc candidate matches the supplied reference route at a GPS observation. Arc IDs are local to each trip's graph and are not treated as global classes.

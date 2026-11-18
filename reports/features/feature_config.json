@@ -1,0 +1,8 @@
+{
+ "radius_m": 50.0,
+ "max_candidates": 8,
+ "densify_m": 5.0,
+ "route_cutoff_min_m": 300.0,
+ "route_cutoff_factor": 3.0,
+ "backtrack_tol_m": 10.0
+}

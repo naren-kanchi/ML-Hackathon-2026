@@ -3,3 +3,5 @@ Dataset/
 .env
 __pycache__/
 .DS_Store
+data/processed/
+data/features/

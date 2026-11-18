@@ -1,0 +1,9 @@
+{
+ "gap_split_s": 120.0,
+ "stat_window_s": 60.0,
+ "stat_box_m": 30.0,
+ "spike_speed_kmh": 250.0,
+ "min_dist_m": 10.0,
+ "min_segment_points": 3,
+ "label_max_dist_m": 50.0
+}
