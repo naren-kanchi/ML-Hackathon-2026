@@ -1,16 +1,18 @@
-# React + Vite
+# PathSnap evaluator UI
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+React/Vite evaluator dashboard connected to the FastAPI backend.
 
-Currently, two official plugins are available:
+## Start
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+From the repository root, start the API in one terminal. In another PowerShell terminal:
 
-## React Compiler
+```powershell
+cd frontend
+npm install
+$env:VITE_API_BASE_URL = "http://localhost:8000"
+npm run dev -- --host 0.0.0.0
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+The UI checks `GET /health`, gets available IDs from `GET /api/v1/trips`, then requests a prediction with `GET /api/v1/trips/{trip_id}`. Its API client is `src/services/api.js`.
 
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+For two laptops, point `VITE_API_BASE_URL` at the API laptop's LAN address and configure `PATHSNAP_CORS_ORIGINS` on the API laptop to include the UI origin, such as `http://192.168.1.20:5173`.

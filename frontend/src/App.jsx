@@ -1,5 +1,5 @@
 
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   Activity,
   LayoutDashboard,
@@ -15,20 +15,73 @@ import {
   Menu,
   Zap,
 } from 'lucide-react'
-import RouteMap from './components/RouteMap'
 import RouteMap3D from './components/RouteMap3D'
+import { checkBackendHealth, fetchTrips, requestPrediction } from './services/api'
 
-const trips = Array.from({ length: 10 }, (_, index) => ({
-  id: `Trip ${String(index + 1).padStart(2, '0')}`,
-  number: String(index + 1).padStart(2, '0'),
-}))
+const EMPTY_LIST = []
 
 function App() {
-  const [selectedTrip, setSelectedTrip] = useState('01')
+  const [trips, setTrips] = useState([])
+  const [selectedTrip, setSelectedTrip] = useState('')
   const [activePage, setActivePage] = useState('Overview')
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [predictionStatus, setPredictionStatus] = useState('idle')
   const [backendStatus, setBackendStatus] = useState('unknown')
+  const [prediction, setPrediction] = useState(null)
+  const [predictionError, setPredictionError] = useState('')
+  const [predictionsRun, setPredictionsRun] = useState(0)
+
+  useEffect(() => {
+    let cancelled = false
+    async function loadEvaluatorTrips() {
+      try {
+        await checkBackendHealth()
+        const result = await fetchTrips()
+        if (cancelled) return
+        const availableTrips = Array.isArray(result.trip_ids) ? result.trip_ids : []
+        setTrips(availableTrips)
+        setSelectedTrip((current) => current && availableTrips.includes(current)
+          ? current
+          : (availableTrips[0] ?? ''))
+        setBackendStatus('online')
+        setPredictionError(availableTrips.length ? '' : 'The API has no available trips in its configured partition.')
+      } catch (error) {
+        if (cancelled) return
+        setBackendStatus('offline')
+        setPredictionError(error.response?.data?.detail ?? 'Could not connect to the PathSnap API.')
+      }
+    }
+    loadEvaluatorTrips()
+    return () => { cancelled = true }
+  }, [])
+
+  async function runPrediction() {
+    if (!selectedTrip || predictionStatus === 'loading') return
+    setPredictionStatus('loading')
+    setPredictionError('')
+    setPrediction(null)
+    try {
+      const result = await requestPrediction(selectedTrip)
+      setPrediction(result)
+      setPredictionStatus('success')
+      setPredictionsRun((count) => count + 1)
+    } catch (error) {
+      setPredictionStatus('error')
+      setPredictionError(error.response?.data?.detail ?? error.message ?? 'Prediction failed.')
+    }
+  }
+
+  const gpsPoints = useMemo(
+    () => prediction?.observations?.map((observation) => observation.gps) ?? EMPTY_LIST,
+    [prediction],
+  )
+  const predictedRoute = prediction?.predicted_route ?? EMPTY_LIST
+  const metrics = prediction?.evaluation
+  const formatMetric = (value, multiplier = 1) => (
+    value === null || value === undefined || !Number.isFinite(value)
+      ? '--'
+      : (value * multiplier).toFixed(2)
+  )
 
   return (
     <div className="min-h-screen bg-[#080d18] text-slate-100 flex">
@@ -196,7 +249,7 @@ function App() {
             {[
               {
                 label: 'Evaluation Trips',
-                value: '10',
+                value: trips.length,
                 detail: 'Reserved trips',
                 icon: Route,
                 color: 'text-blue-400',
@@ -204,7 +257,7 @@ function App() {
               },
               {
                 label: 'Selected Trip',
-                value: selectedTrip,
+                value: selectedTrip || '--',
                 detail: 'Current selection',
                 icon: Navigation,
                 color: 'text-cyan-400',
@@ -212,16 +265,16 @@ function App() {
               },
               {
                 label: 'API Status',
-                value: 'Offline',
-                detail: 'Awaiting connection',
+                value: backendStatus === 'online' ? 'Online' : backendStatus === 'offline' ? 'Offline' : 'Checking',
+                detail: backendStatus === 'online' ? 'Connected to FastAPI' : 'PathSnap API connection',
                 icon: Wifi,
-                color: 'text-yellow-400',
-                bg: 'bg-yellow-500/10',
+                color: backendStatus === 'online' ? 'text-green-400' : 'text-yellow-400',
+                bg: backendStatus === 'online' ? 'bg-green-500/10' : 'bg-yellow-500/10',
               },
               {
                 label: 'Predictions',
-                value: '--',
-                detail: 'No predictions yet',
+                value: predictionsRun,
+                detail: 'Successful requests this session',
                 icon: Zap,
                 color: 'text-purple-400',
                 bg: 'bg-purple-500/10',
@@ -261,19 +314,25 @@ function App() {
 
               <div className="flex items-center gap-2 text-xs text-slate-400 bg-slate-800/60 px-3 py-2 rounded-lg">
                 <Search size={14} />
-                10 available slots
+                {trips.length} available trips
               </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
 
-              {trips.map((trip) => {
-                const active = selectedTrip === trip.number
+              {trips.map((tripId, index) => {
+                const number = String(index + 1).padStart(2, '0')
+                const active = selectedTrip === tripId
 
                 return (
                   <button
-                    key={trip.id}
-                    onClick={() => setSelectedTrip(trip.number)}
+                    key={tripId}
+                    onClick={() => {
+                      setSelectedTrip(tripId)
+                      setPrediction(null)
+                      setPredictionStatus('idle')
+                      setPredictionError('')
+                    }}
                     className={`text-left p-4 rounded-xl border transition-all ${
                       active
                         ? 'bg-blue-600/10 border-blue-500/60'
@@ -284,7 +343,7 @@ function App() {
                       <span className={`text-xs font-semibold ${
                         active ? 'text-blue-400' : 'text-slate-500'
                       }`}>
-                        TRIP {trip.number}
+                        TRIP {number}
                       </span>
 
                       {active && (
@@ -292,17 +351,23 @@ function App() {
                       )}
                     </div>
 
-                    <p className="font-semibold text-sm">{trip.id}</p>
+                    <p className="font-semibold text-sm">{tripId}</p>
 
                     <div className="flex items-center justify-between mt-3">
                       <span className="text-[11px] text-slate-500">
-                        Awaiting API
+                        {prediction?.trip_id === tripId ? 'Predicted' : 'Ready'}
                       </span>
                       <ChevronRight size={15} className="text-slate-500" />
                     </div>
                   </button>
                 )
               })}
+
+              {trips.length === 0 && (
+                <p className="col-span-full text-sm text-slate-500">
+                  {backendStatus === 'offline' ? 'Start the API and check its data path.' : 'Loading available trips…'}
+                </p>
+              )}
 
             </div>
 
@@ -311,7 +376,7 @@ function App() {
               <div>
                 <p className="text-sm font-medium">Trip selection ready</p>
                 <p className="text-xs text-slate-500 mt-1">
-                  Selected Trip {selectedTrip}. Backend integration will be added after the API contract is confirmed.
+                  {selectedTrip ? `Selected trip ${selectedTrip}. The API keeps route references on the server.` : predictionError || 'Waiting for trips from the API.'}
                 </p>
               </div>
             </div>
@@ -345,7 +410,7 @@ function App() {
   </div>
 
   <div className="h-[600px] rounded-xl overflow-hidden border border-slate-700/60">
-     <RouteMap3D />
+     <RouteMap3D gpsPoints={gpsPoints} predictedRoute={predictedRoute} />
   </div>
 
   </div>
@@ -365,10 +430,10 @@ function App() {
   <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
 
     {[
-      { name: 'Top-1 Accuracy', value: '--', unit: '%', description: 'Correct road predictions' },
-      { name: 'Macro F1-score', value: '--', unit: '', description: 'Classification performance' },
-      { name: 'Route Continuity', value: '--', unit: '%', description: 'Connected road transitions' },
-      { name: 'Inference Time', value: '--', unit: 's', description: 'Prediction processing time' },
+      { name: 'Top-1 Accuracy', value: formatMetric(metrics?.viterbi_top1_accuracy, 100), unit: '%', description: 'Viterbi observation accuracy' },
+      { name: 'Macro F1-score', value: formatMetric(metrics?.viterbi_macro_f1), unit: '', description: 'Viterbi macro F1' },
+      { name: 'Route Continuity', value: formatMetric(metrics?.viterbi_route_continuity, 100), unit: '%', description: 'Connected road transitions' },
+      { name: 'Inference Time', value: formatMetric(prediction?.inference_time_seconds), unit: 's', description: 'Prediction processing time' },
     ].map((metric) => (
       <div
         key={metric.name}
@@ -393,7 +458,7 @@ function App() {
 
   <div className="mt-5 p-4 rounded-xl bg-slate-800/40 border border-slate-700/50">
     <p className="text-xs text-slate-400">
-      Evaluation results will be displayed after a successful prediction.
+      {metrics ? `${metrics.evaluated_observations} labeled observations evaluated · Candidate miss rate ${formatMetric(metrics.candidate_miss_rate, 100)}%. Reference route labels remain server-side.` : prediction ? 'No server-side reference route is available for this trip; prediction is returned without evaluation metrics.' : 'Run a prediction to display its evaluation metrics.'}
     </p>
   </div>
 
@@ -419,11 +484,12 @@ function App() {
     </div>
 
     <button
-      onClick={() => setPredictionStatus('backend-pending')}
-      className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold transition shadow-lg shadow-blue-600/20"
+      onClick={runPrediction}
+      disabled={!selectedTrip || backendStatus !== 'online' || predictionStatus === 'loading'}
+      className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold transition shadow-lg shadow-blue-600/20"
     >
       <Zap size={18} />
-      Run Prediction
+      {predictionStatus === 'loading' ? 'Predicting…' : 'Run Prediction'}
     </button>
 
   </div>
@@ -432,21 +498,22 @@ function App() {
 
     <div className="flex items-center gap-3">
 
-      <div className="w-10 h-10 rounded-lg bg-yellow-500/10 flex items-center justify-center">
-        <Activity size={20} className="text-yellow-400" />
+      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${predictionStatus === 'error' ? 'bg-red-500/10' : predictionStatus === 'success' ? 'bg-green-500/10' : 'bg-yellow-500/10'}`}>
+        <Activity size={20} className={predictionStatus === 'error' ? 'text-red-400' : predictionStatus === 'success' ? 'text-green-400' : 'text-yellow-400'} />
       </div>
 
       <div>
         <p className="text-sm font-medium">
-          {predictionStatus === 'backend-pending'
-            ? 'Backend integration pending'
-            : 'Ready for evaluation'}
+          {predictionStatus === 'loading' ? 'Prediction running'
+            : predictionStatus === 'success' ? 'Prediction complete'
+              : predictionStatus === 'error' ? 'Prediction failed'
+                : backendStatus === 'online' ? 'Ready for evaluation' : 'Connecting to backend'}
         </p>
 
         <p className="text-xs text-slate-500 mt-1">
-          {predictionStatus === 'backend-pending'
-            ? 'FastAPI is not connected yet. No prediction has been executed.'
-            : `Selected Trip ${selectedTrip} · Waiting for backend connection`}
+          {predictionError || (prediction
+            ? `${prediction.observation_count} GPS observations · ${prediction.predicted_route.length} predicted route segments`
+            : selectedTrip ? `Selected trip ${selectedTrip} · ${backendStatus === 'online' ? 'Ready to predict' : 'Waiting for API connection'}` : 'Waiting for an available trip from the API.')}
         </p>
       </div>
 
@@ -479,15 +546,15 @@ function App() {
     {[
       {
         label: 'Selected Trip',
-        value: `Trip ${selectedTrip}`,
+        value: selectedTrip || '--',
       },
       {
         label: 'GPS Observations',
-        value: '--',
+        value: prediction?.observation_count ?? '--',
       },
       {
         label: 'Predicted Segments',
-        value: '--',
+        value: prediction?.predicted_route?.length ?? '--',
       },
     ].map((item) => (
       <div
@@ -519,28 +586,42 @@ function App() {
       </span>
     </div>
 
-    <div className="min-h-24 flex flex-col items-center justify-center text-center">
-
-      <div className="w-12 h-12 rounded-xl bg-slate-800 flex items-center justify-center mb-3">
-        <Route size={22} className="text-slate-400" />
+    {prediction ? (
+      <div>
+        <div className="flex flex-wrap gap-2">
+          {prediction.predicted_route.slice(0, 30).map((segment, index) => (
+            <span key={`${segment.arc_id}-${index}`} className="px-2.5 py-1.5 rounded-lg bg-green-500/10 border border-green-500/20 text-green-300 text-xs">
+              {segment.arc_id}
+            </span>
+          ))}
+          {prediction.predicted_route.length > 30 && (
+            <span className="px-2.5 py-1.5 text-slate-500 text-xs">
+              +{prediction.predicted_route.length - 30} more
+            </span>
+          )}
+        </div>
+        <p className="text-xs text-slate-500 mt-4">
+          Classifier-only and Viterbi sequences are available in the API response. Mean emission confidence: {formatMetric(prediction.mean_emission_confidence)}.
+        </p>
       </div>
-
-      <p className="text-sm text-slate-400">
-        No prediction available
-      </p>
-
-      <p className="text-xs text-slate-600 mt-1">
-        Run a prediction after connecting the backend.
-      </p>
-
-    </div>
+    ) : (
+      <div className="min-h-24 flex flex-col items-center justify-center text-center">
+        <div className="w-12 h-12 rounded-xl bg-slate-800 flex items-center justify-center mb-3">
+          <Route size={22} className="text-slate-400" />
+        </div>
+        <p className="text-sm text-slate-400">No prediction available</p>
+        <p className="text-xs text-slate-600 mt-1">
+          Select a trip and run the prediction to see its road sequence.
+        </p>
+      </div>
+    )}
 
   </div>
 
   {/* PROCESSING INFORMATION */}
   <div className="mt-4 flex items-center gap-2 text-xs text-slate-500">
     <Activity size={15} />
-    Prediction output will appear here after successful inference.
+    {prediction ? `Classifier-only and Viterbi outputs received for ${prediction.trip_id}.` : 'Prediction output will appear here after successful inference.'}
   </div>
 
 </div>

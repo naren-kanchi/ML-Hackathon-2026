@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import re
+import time
 from functools import lru_cache
 from pathlib import Path
 from typing import Any
@@ -66,7 +67,9 @@ def predict(trip_id: str) -> dict[str, Any]:
     """Return classifier and Viterbi predictions, plus aggregate metrics only."""
     trip_dir = _trip_dir(trip_id)
     try:
+        started = time.perf_counter()
         prediction = predict_trip(trip_dir, _model_bundle())
+        prediction["inference_time_seconds"] = time.perf_counter() - started
         # Reference route labels are loaded only after prediction completes.
         metrics = evaluate_reference(prediction, trip_dir)
     except FileNotFoundError as exc:

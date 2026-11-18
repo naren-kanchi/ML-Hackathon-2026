@@ -48,7 +48,7 @@ The command writes `histgradientboosting.joblib` and `metrics.json`. Add `--tria
 
 The checked-in model and metrics were produced with seed 42, 80 training trips, five-fold GroupKFold by trip, and the 10 student-test trips. Five-trial Bayesian optimization selected learning_rate=0.03846, max_iter=210, max_leaf_nodes=60, min_samples_leaf=10, and l2_regularization=9.4762. Tuned CV candidate-level macro F1 was 0.9181; student-test candidate-level macro F1 was 0.9102 (accuracy 0.9840, log loss 0.0426). Candidate miss rates were 0.11% (train) and 0.22% (student test). These are candidate classification results, not route-level accuracy. Route labels are ordered arc sequences; the implementation projects each route arc to its nearest GPS sample using the arc midpoint and records candidate misses separately.
 
-This is one model experiment. The hackathon instructions also require at least five model comparisons, route decoding, API/UI work, and a technical report; those components are not claimed as complete here. Do not present unrun experiments as results.
+This repository currently records one model experiment. The route decoder and the FastAPI-to-React inference flow are implemented, but the hackathon's five-model comparison and consolidated technical report still need to be completed. Do not present unrun experiments as results.
 
 ## Backend API
 
@@ -67,4 +67,16 @@ uvicorn backend.main:app --host 0.0.0.0 --port 8000
 
 The browser API is documented at `http://localhost:8000/docs`. `GET /api/v1/trips` lists available trip IDs. `GET /api/v1/trips/{trip_id}` returns classifier-only and Viterbi arc predictions, observed GPS points, route geometry, route continuity, and aggregate metrics if server-side reference labels are available. Reference labels are never included in the response.
 
-For evaluator deployment, set `PATHSNAP_DATA_DIR` to the server-only evaluator dataset and `PATHSNAP_PARTITION=evaluator_test`. Set `PATHSNAP_CORS_ORIGINS` to the UI origin(s), comma separated. For a second laptop, set the browser's `window.PATHSNAP_API_BASE_URL` to `http://<api-laptop-lan-address>:8000` before loading `frontend/src/pathsnap-api.js`. The helper exports `pathsnapApi.listTrips()` and `pathsnapApi.predictTrip(tripId)`.
+### Connect the React frontend
+
+In a second terminal, from `frontend/`:
+
+```powershell
+npm install
+$env:VITE_API_BASE_URL = "http://localhost:8000"
+npm run dev -- --host 0.0.0.0
+```
+
+The React app checks `GET /health`, loads trip IDs from `GET /api/v1/trips`, and requests a selected trip from `GET /api/v1/trips/{trip_id}`. The Axios client is in `frontend/src/services/api.js`; the dashboard renders returned route geometry, GPS observations, and evaluation metrics. For two laptops, set `VITE_API_BASE_URL` to the API laptop's LAN address and set `PATHSNAP_CORS_ORIGINS` on the API to the UI laptop's origin, for example `http://192.168.1.20:5173`.
+
+For evaluator deployment, set `PATHSNAP_DATA_DIR` to the server-only evaluator dataset and `PATHSNAP_PARTITION=evaluator_test`. Keep reference route files on the API server; the prediction pipeline reads route files only after inference and returns aggregate metrics without labels.
