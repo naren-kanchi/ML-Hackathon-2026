@@ -5,3 +5,29 @@ __pycache__/
 .DS_Store
 data/processed/
 data/features/
+
+# Hackathon brief PDFs
+*.pdf
+
+# Training and testing data
+Student folder/
+
+# Python caches / environments
+*.py[cod]
+venv/
+env/
+.ipynb_checkpoints/
+.pytest_cache/
+
+# Editor / OS files
+.vscode/
+.idea/
+*.swp
+Thumbs.db
+desktop.ini
+
+# Regenerable derived data and caches (rebuild with the scripts in scripts/)
+outputs/labels/**/*.npz
+outputs/cache/
+outputs/preds/
+outputs/logs/
